@@ -1,0 +1,30 @@
+{
+  "name": "@Mean-Finance/permit2-adapters",
+  "description": "This repository holds some adapter contracts that will allow to use Permit2 from contracts that don't support it natively",
+  "version": "1.0.0",
+  "author": {
+    "name": "Mean-Finance",
+    "url": "https://github.com/Mean-Finance"
+  },
+  "devDependencies": {
+    "prettier": "^2.8.7",
+    "solhint-community": "^3.5.0"
+  },
+  "keywords": [
+    "blockchain",
+    "ethereum",
+    "forge",
+    "foundry",
+    "smart-contracts",
+    "solidity",
+    "template"
+  ],
+  "private": true,
+  "scripts": {
+    "clean": "rm -rf cache out",
+    "lint": "pnpm lint:sol && pnpm prettier:check",
+    "lint:sol": "forge fmt --check && pnpm solhint \"{script,src,test}/**/*.sol\"",
+    "prettier:check": "prettier --check \"**/*.{json,md,yml}\"",
+    "prettier:write": "prettier --write \"**/*.{json,md,yml}\""
+  }
+}
