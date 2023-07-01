@@ -1,5 +1,5 @@
 {
-  "name": "@Mean-Finance/permit2-adapters",
+  "name": "@mean-finance/permit2-adapter",
   "description": "This repository holds some adapter contracts that will allow to use Permit2 from contracts that don't support it natively",
   "version": "1.0.0",
   "author": {
