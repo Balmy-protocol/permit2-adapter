@@ -48,7 +48,6 @@ abstract contract SwapPermit2Adapter is BasePermit2Adapter, ISwapPermit2Adapter 
     // Set amount in
     _amountIn = _params.amountIn;
   }
-
   /// @inheritdoc ISwapPermit2Adapter
   function sellOrderSwapWithGasMeasurement(SellOrderSwapParams calldata _params)
     external
