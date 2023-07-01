@@ -32,6 +32,29 @@ interface ISwapPermit2Adapter is IBasePermit2Adapter {
     Token.DistributionTarget[] transferOut;
   }
 
+  // @notice Swap params for a buy order
+  struct BuyOrderSwapParams {
+    // Deadline
+    uint256 deadline;
+    // Take from caller
+    address tokenIn;
+    uint256 maxAmountIn;
+    uint256 nonce;
+    bytes signature;
+    // Swap approval
+    address allowanceTarget;
+    // Swap execution
+    address swapper;
+    bytes swapData;
+    // Swap validation
+    address tokenOut;
+    uint256 amountOut;
+    // Transfer token out
+    Token.DistributionTarget[] transferOut;
+    // Transfer token in
+    address unspentTokenInRecipient;
+  }
+
   /**
    * @notice Executes a sell order swap by proxing to another contract, but using Permit2 to transfer tokens from the
    * caller
@@ -55,6 +78,33 @@ interface ISwapPermit2Adapter is IBasePermit2Adapter {
    * @return gasSpent The gas spent on the entire swap
    */
   function sellOrderSwapWithGasMeasurement(SellOrderSwapParams calldata params)
+    external
+    payable
+    returns (uint256 amountIn, uint256 amountOut, uint256 gasSpent);
+
+  /**
+   * @notice Executes a buy order swap by proxing to another contract, but using Permit2 to transfer tokens from the
+   * caller
+   * @param params The swap's data, such as tokens, amounts, recipient, etc
+   * @return amountIn The amount ot `token in` spent on the swap
+   * @return amountOut The amount of `token out` produced by the proxied swap
+   */
+  function buyOrderSwap(BuyOrderSwapParams calldata params)
+    external
+    payable
+    returns (uint256 amountIn, uint256 amountOut);
+
+  /**
+   * @notice Executes a buy order swap by proxing to another contract, but using Permit2 to transfer tokens from the
+   * caller
+   * @dev The idea behind this function is to have a way to simulate a swap and get both the amount out, and the gas
+   * spent on the swap. All in one call
+   * @param params The swap's data, such as tokens, amounts, recipient, etc
+   * @return amountIn The amount ot `token in` spent on the swap
+   * @return amountOut The amount of `token out` produced by the proxied swap
+   * @return gasSpent The gas spent on the entire swap
+   */
+  function buyOrderSwapWithGasMeasurement(BuyOrderSwapParams calldata params)
     external
     payable
     returns (uint256 amountIn, uint256 amountOut, uint256 gasSpent);

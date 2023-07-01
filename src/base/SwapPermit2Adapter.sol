@@ -48,8 +48,8 @@ abstract contract SwapPermit2Adapter is BasePermit2Adapter, ISwapPermit2Adapter 
     // Set amount in
     _amountIn = _params.amountIn;
   }
-  /// @inheritdoc ISwapPermit2Adapter
 
+  /// @inheritdoc ISwapPermit2Adapter
   function sellOrderSwapWithGasMeasurement(SellOrderSwapParams calldata _params)
     external
     payable
@@ -57,6 +57,47 @@ abstract contract SwapPermit2Adapter is BasePermit2Adapter, ISwapPermit2Adapter 
   {
     uint256 _gasAtStart = gasleft();
     (_amountIn, _amountOut) = sellOrderSwap(_params);
+    _gasSpent = _gasAtStart - gasleft();
+  }
+
+  /// @inheritdoc ISwapPermit2Adapter
+  function buyOrderSwap(BuyOrderSwapParams calldata _params)
+    public
+    payable
+    checkDeadline(_params.deadline)
+    returns (uint256 _amountIn, uint256 _amountOut)
+  {
+    // Take from caller
+    PERMIT2.takeFromCaller(_params.tokenIn, _params.maxAmountIn, _params.nonce, _params.deadline, _params.signature);
+
+    // Max approve token in
+    _params.tokenIn.maxApproveIfNecessary(_params.allowanceTarget);
+
+    // Execute swap
+    _params.swapper.functionCallWithValue(_params.swapData, msg.value);
+
+    // Check min amount
+    _amountOut = _params.tokenOut.balanceOnContract();
+    if (_amountOut < _params.amountOut) revert ReceivedTooLittleTokenOut(_amountOut, _params.amountOut);
+
+    // Distribute token out
+    _params.tokenOut.distributeTo(_params.transferOut);
+
+    // Send unspent to the set recipient
+    uint256 _unspentTokenIn = _params.tokenIn.sendBalanceOnContractTo(_params.unspentTokenInRecipient);
+
+    // Set amount in
+    _amountIn = _params.maxAmountIn - _unspentTokenIn;
+  }
+
+  /// @inheritdoc ISwapPermit2Adapter
+  function buyOrderSwapWithGasMeasurement(BuyOrderSwapParams calldata _params)
+    external
+    payable
+    returns (uint256 _amountIn, uint256 _amountOut, uint256 _gasSpent)
+  {
+    uint256 _gasAtStart = gasleft();
+    (_amountIn, _amountOut) = buyOrderSwap(_params);
     _gasSpent = _gasAtStart - gasleft();
   }
 }
