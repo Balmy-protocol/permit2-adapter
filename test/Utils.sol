@@ -59,6 +59,24 @@ library Utils {
     });
   }
 
+  // solhint-disable-next-line no-empty-blocks
+  function buildEmptyBatchPermit() internal pure returns (IArbitraryExecutionPermit2Adapter.BatchPermit memory) { }
+
+  function buildBatchPermit(
+    address _token,
+    uint256 _amount,
+    uint256 _nonce,
+    bytes memory _signature
+  )
+    internal
+    pure
+    returns (IArbitraryExecutionPermit2Adapter.BatchPermit memory _permit)
+  {
+    IPermit2.TokenPermissions[] memory _tokens = new IPermit2.TokenPermissions[](1);
+    _tokens[0] = IPermit2.TokenPermissions({ token: _token, amount: _amount });
+    _permit = IArbitraryExecutionPermit2Adapter.BatchPermit({ tokens: _tokens, nonce: _nonce, signature: _signature });
+  }
+
   function buildEmptyAllowanceTargets()
     internal
     pure

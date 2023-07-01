@@ -145,6 +145,129 @@ contract ArbitraryExecutionPermit2AdapterTest is PRBTest, StdUtils {
     assertEq(tokenOut.balanceOf(bob), _tokenOutAmount);
     assertEq(tokenIn.allowance(address(adapter), address(target)), type(uint256).max);
   }
+
+  function testFuzz_executeWithBatchPermit_RevertWhen_DeadlineHasPassed(uint256 _timestamp) public {
+    vm.assume(_timestamp > 0);
+    vm.warp(_timestamp);
+
+    vm.expectRevert(
+      abi.encodeWithSelector(IBasePermit2Adapter.TransactionDeadlinePassed.selector, _timestamp, _timestamp - 1)
+    );
+    adapter.executeWithBatchPermit(
+      Utils.buildEmptyBatchPermit(),
+      Utils.buildEmptyAllowanceTargets(),
+      Utils.buildEmptyContractCalls(),
+      Utils.buildEmptyTransferOut(),
+      _timestamp - 1
+    );
+  }
+
+  function test_executeWithBatchPermit_WorksWhenNothingIsExecuted() public {
+    // Prepare call assertions
+    vm.expectCall(
+      address(permit2),
+      abi.encodeWithSignature(
+        // solhint-disable max-line-length
+        "permitTransferFrom(((address,uint256)[],uint256,uint256),(address,uint256),address,bytes)"
+      ),
+      0
+    ); // Permit2 was not called
+    vm.expectCall(address(tokenIn), abi.encodeWithSelector(tokenIn.approve.selector), 0); // Approve was not called
+    vm.expectCall(address(tokenIn), abi.encodeWithSelector(tokenIn.transfer.selector), 0); // Transfer was not called
+    vm.expectCall(address(tokenOut), abi.encodeWithSelector(tokenOut.transfer.selector), 0); // Transfer was not called
+
+    // Execute
+    (bytes[] memory _executionResults, uint256[] memory _tokenBalances) = adapter.executeWithBatchPermit(
+      Utils.buildEmptyBatchPermit(),
+      Utils.buildEmptyAllowanceTargets(),
+      Utils.buildEmptyContractCalls(),
+      Utils.buildEmptyTransferOut(),
+      type(uint256).max
+    );
+
+    // Assertions
+    assertEq(_executionResults.length, 0);
+    assertEq(_tokenBalances.length, 0);
+  }
+
+  function testFuzz_executeWithBatchPermit_WorksWithNative(uint256 _nativeAmount, uint240 _tokenOutAmount) public {
+    // So we can transfer the necessary amount
+    _nativeAmount = bound(_nativeAmount, 0, address(this).balance);
+
+    // Prepare execution
+    address _target = address(target);
+    bytes memory _data = abi.encodeWithSelector(target.someFunction.selector, _nativeAmount, tokenOut, _tokenOutAmount);
+
+    // Prepare call assertions
+    vm.expectCall(
+      address(permit2),
+      abi.encodeWithSignature(
+        "permitTransferFrom(((address,uint256)[],uint256,uint256),(address,uint256),address,bytes)"
+      ),
+      0
+    ); // Permit2 was not called
+    vm.expectCall(address(tokenIn), abi.encodeWithSelector(tokenIn.approve.selector), 0); // Approve was not called
+    vm.expectCall(address(tokenIn), abi.encodeWithSelector(tokenIn.transfer.selector), 0); // Transfer was not called
+
+    // Execute
+    (bytes[] memory _executionResults, uint256[] memory _tokenBalances) = adapter.executeWithBatchPermit{
+      value: _nativeAmount
+    }(
+      Utils.buildEmptyBatchPermit(),
+      Utils.buildEmptyAllowanceTargets(),
+      Utils.buildContractCalls(_target, _data, _nativeAmount),
+      Utils.buildTransferOut(address(tokenOut), Utils.buildDistribution(alice, 2500, bob)),
+      type(uint256).max
+    );
+
+    // Assertions
+    assertEq(_executionResults.length, 1);
+    uint256 _decoded = abi.decode(_executionResults[0], (uint256));
+    assertEq(_decoded, _nativeAmount);
+    assertEq(_tokenBalances.length, 1);
+    assertEq(_tokenBalances[0], _tokenOutAmount);
+    uint256 _aliceAmount = uint256(_tokenOutAmount) * 25 / 100;
+    assertEq(tokenOut.balanceOf(alice), _aliceAmount);
+    assertEq(tokenOut.balanceOf(bob), _tokenOutAmount - _aliceAmount);
+  }
+
+  function testFuzz_executeWithBatchPermit_WorksWithERC20(
+    uint256 _tokenInAmount,
+    uint248 _tokenOutAmount,
+    uint256 _nonce,
+    bytes calldata _signature
+  )
+    public
+  {
+    // Give alice some tokens
+    tokenIn.mint(alice, _tokenInAmount);
+
+    // Execute
+    vm.prank(alice);
+    (bytes[] memory _executionResults, uint256[] memory _tokenBalances) = adapter.executeWithBatchPermit(
+      Utils.buildBatchPermit(address(tokenIn), _tokenInAmount, _nonce, _signature),
+      Utils.buildAllowanceTargets(address(target), address(tokenIn)),
+      Utils.buildContractCalls(
+        address(target),
+        abi.encodeWithSelector(target.takeFrom.selector, tokenIn, _tokenInAmount, tokenOut, _tokenOutAmount),
+        0
+      ),
+      Utils.buildTransferOut(address(tokenOut), Utils.buildDistribution(bob)),
+      type(uint256).max
+    );
+
+    // Assertions
+    assertEq(_executionResults.length, 1);
+    uint256 _decoded = abi.decode(_executionResults[0], (uint256));
+    assertEq(_decoded, _tokenInAmount);
+    assertEq(_tokenBalances.length, 1);
+    assertEq(_tokenBalances[0], _tokenOutAmount);
+    assertEq(tokenIn.balanceOf(alice), 0);
+    assertEq(tokenIn.balanceOf(address(target)), _tokenInAmount);
+    assertEq(tokenOut.balanceOf(alice), 0);
+    assertEq(tokenOut.balanceOf(bob), _tokenOutAmount);
+    assertEq(tokenIn.allowance(address(adapter), address(target)), type(uint256).max);
+  }
 }
 
 contract TargetContract {
