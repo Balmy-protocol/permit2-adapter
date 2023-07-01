@@ -55,7 +55,7 @@ library Token {
 
   /**
    * @notice Distributes the available amount of the given token according to the set distribution. All tokens
-   *         will be distributed according to the configured shares, and the last target will be sent all unassigned
+   *         will be distributed according to the configured shares. The last target will get sent all unassigned
    *         tokens
    * @param _token The token to distribute
    * @param _distribution How to distribute the available amount of the token. Must have at least one target

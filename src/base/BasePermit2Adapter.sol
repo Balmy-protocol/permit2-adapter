@@ -8,7 +8,6 @@ import { Token } from "../libraries/Token.sol";
  * @title Base Permit2 Adapter
  * @author Sam Bugs
  * @notice The base contract for Permit2 adapters
- * @dev It contains a lot of small helpers for adapters to use
  */
 abstract contract BasePermit2Adapter is IBasePermit2Adapter {
   /// @inheritdoc IBasePermit2Adapter
