@@ -28,7 +28,7 @@ library Token {
    * @return _balance The current balance held by the contract
    */
   function balanceOnContract(address _token) internal view returns (uint256 _balance) {
-    return address(_token) == NATIVE_TOKEN ? address(this).balance : IERC20(_token).balanceOf(address(this));
+    return _token == NATIVE_TOKEN ? address(this).balance : IERC20(_token).balanceOf(address(this));
   }
 
   /**
@@ -74,8 +74,9 @@ library Token {
     for (uint256 i; i < _distribution.length - 1;) {
       uint256 _toSend = _available * _distribution[i].shareBps / 10_000;
       sendAmountTo(_token, _toSend, _distribution[i].recipient);
-      _amountLeft -= _toSend;
       unchecked {
+        // We know that _toSend <= _amountLeft because if it wasn't, sendAmountTo would have reverted
+        _amountLeft -= _toSend;
         ++i;
       }
     }
