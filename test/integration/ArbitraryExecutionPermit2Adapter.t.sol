@@ -20,6 +20,8 @@ contract ArbitraryExecutionPermit2AdapterTest is PRBTest, StdCheats {
   address internal alice = 0x9baA1c73dA6EaDE1D9Cd299b380181EFDDD38D0f;
   address internal bob = address(1);
   uint256 internal aliceKey = 0x3b226dfc360dd6c280a1e10cf039309949f0e1144cb24a233fd9512cd5c6edcd;
+  uint256 amountToDeposit = 10_000e6; // 10k USDC
+
 
   function setUp() public virtual {
     vm.createSelectFork({ urlOrAlias: "optimism", blockNumber: 106_238_587 });
@@ -28,17 +30,17 @@ contract ArbitraryExecutionPermit2AdapterTest is PRBTest, StdCheats {
     vm.prank(alice);
     USDC.approve(address(PERMIT2), type(uint256).max);
 
+    // Give alice the necessary funds
+    deal(address(USDC), alice, amountToDeposit);
+
     // We are using the universal adapter to test arbitrary execution so that we can verify the full integration
     adapter = new UniversalPermit2Adapter(PERMIT2);
   }
 
   function testFork_executeWithPermit_DepositIntoExactly() public {
-    uint256 _amountToDeposit = 10_000e6; // 10k USDC
-    deal(address(USDC), alice, _amountToDeposit);
-
     // Prepare permit
     IArbitraryExecutionPermit2Adapter.SinglePermit memory _permit = Utils.buildSignedPermit(
-      address(USDC), _amountToDeposit, 0, type(uint256).max, address(adapter), aliceKey, PERMIT2.DOMAIN_SEPARATOR()
+      address(USDC), amountToDeposit, 0, type(uint256).max, address(adapter), aliceKey, PERMIT2.DOMAIN_SEPARATOR()
     );
 
     // Execute
@@ -48,7 +50,7 @@ contract ArbitraryExecutionPermit2AdapterTest is PRBTest, StdCheats {
       Utils.buildAllowanceTargets(address(EXACTLY_USDC_VAULT), address(USDC)),
       Utils.buildContractCalls(
         address(EXACTLY_USDC_VAULT),
-        abi.encodeWithSelector(EXACTLY_USDC_VAULT.deposit.selector, _amountToDeposit, address(adapter)),
+        abi.encodeWithSelector(EXACTLY_USDC_VAULT.deposit.selector, amountToDeposit, address(adapter)),
         0
       ),
       Utils.buildTransferOut(address(EXACTLY_USDC_VAULT), Utils.buildDistribution(alice, 5000, bob)),
@@ -68,12 +70,11 @@ contract ArbitraryExecutionPermit2AdapterTest is PRBTest, StdCheats {
   }
 
   function testFork_executeWithPermit_DepositIntoMeanFinance() public {
-    uint256 _amountToDeposit = 10_000e6; // 10k USDC
-    deal(address(USDC), alice, _amountToDeposit);
+    
 
     // Prepare permit
     IArbitraryExecutionPermit2Adapter.SinglePermit memory _permit = Utils.buildSignedPermit(
-      address(USDC), _amountToDeposit, 1, type(uint256).max, address(adapter), aliceKey, PERMIT2.DOMAIN_SEPARATOR()
+      address(USDC), amountToDeposit, 1, type(uint256).max, address(adapter), aliceKey, PERMIT2.DOMAIN_SEPARATOR()
     );
 
     // Execute
@@ -87,7 +88,7 @@ contract ArbitraryExecutionPermit2AdapterTest is PRBTest, StdCheats {
           DCA_HUB.deposit.selector,
           address(USDC),
           DAI,
-          _amountToDeposit,
+          amountToDeposit,
           10,
           1 days,
           alice,
@@ -110,7 +111,7 @@ contract ArbitraryExecutionPermit2AdapterTest is PRBTest, StdCheats {
     assertEq(_position.swapsExecuted, 0);
     assertEq(_position.swapped, 0);
     assertEq(_position.swapsLeft, 10);
-    assertEq(_position.remaining, _amountToDeposit);
-    assertEq(_position.rate, _amountToDeposit / 10);
+    assertEq(_position.remaining, amountToDeposit);
+    assertEq(_position.rate, amountToDeposit / 10);
   }
 }
