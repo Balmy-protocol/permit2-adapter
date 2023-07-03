@@ -22,7 +22,6 @@ contract ArbitraryExecutionPermit2AdapterTest is PRBTest, StdCheats {
   uint256 internal aliceKey = 0x3b226dfc360dd6c280a1e10cf039309949f0e1144cb24a233fd9512cd5c6edcd;
   uint256 amountToDeposit = 10_000e6; // 10k USDC
 
-
   function setUp() public virtual {
     vm.createSelectFork({ urlOrAlias: "optimism", blockNumber: 106_238_587 });
 
@@ -70,8 +69,6 @@ contract ArbitraryExecutionPermit2AdapterTest is PRBTest, StdCheats {
   }
 
   function testFork_executeWithPermit_DepositIntoMeanFinance() public {
-    
-
     // Prepare permit
     IArbitraryExecutionPermit2Adapter.SinglePermit memory _permit = Utils.buildSignedPermit(
       address(USDC), amountToDeposit, 1, type(uint256).max, address(adapter), aliceKey, PERMIT2.DOMAIN_SEPARATOR()
