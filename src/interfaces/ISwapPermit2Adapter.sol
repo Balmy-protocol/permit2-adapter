@@ -20,7 +20,7 @@ interface ISwapPermit2Adapter is IBasePermit2Adapter {
     uint256 amountIn;
     uint256 nonce;
     bytes signature;
-    // Swapp approval
+    // Swap approval
     address allowanceTarget;
     // Swap execution
     address swapper;
