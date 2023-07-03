@@ -38,7 +38,8 @@ interface IArbitraryExecutionPermit2Adapter is IBasePermit2Adapter {
    * @param permit The permit data to use to transfer tokens from the user
    * @param allowanceTargets The contracts to approve before executing calls
    * @param contractCalls The calls to execute
-   * @param transferOut The tokens to transfer out of our contract after all calls have been executed
+   * @param transferOut The tokens to transfer out of our contract after all calls have been executed. Note that each
+   *                    element of the array should handle different tokens
    * @param deadline The max time where this call can be executed
    * @return executionResults The results of each contract call
    * @return tokenBalances The balances held by the contract after contract calls were executed
