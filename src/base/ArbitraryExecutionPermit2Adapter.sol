@@ -38,6 +38,23 @@ abstract contract ArbitraryExecutionPermit2Adapter is BasePermit2Adapter, IArbit
     return _approveExecuteAndTransfer(_allowanceTargets, _contractCalls, _transferOut);
   }
 
+  /// @inheritdoc IArbitraryExecutionPermit2Adapter
+  function executeWithBatchPermit(
+    BatchPermit calldata _batchPermit,
+    AllowanceTarget[] calldata _allowanceTargets,
+    ContractCall[] calldata _contractCalls,
+    TransferOut[] calldata _transferOut,
+    uint256 _deadline
+  )
+    external
+    payable
+    checkDeadline(_deadline)
+    returns (bytes[] memory _executionResults, uint256[] memory _tokenBalances)
+  {
+    PERMIT2.batchTakeFromCaller(_batchPermit.tokens, _batchPermit.nonce, _deadline, _batchPermit.signature);
+    return _approveExecuteAndTransfer(_allowanceTargets, _contractCalls, _transferOut);
+  }
+
   function _approveExecuteAndTransfer(
     AllowanceTarget[] calldata _allowanceTargets,
     ContractCall[] calldata _contractCalls,
