@@ -122,6 +122,11 @@ $ forge coverage
 
 ### Deploy
 
+Deploy to prod:
+```sh
+forge script  script/DeployUniversalAdapter.s.sol --broadcast --verify --rpc-url "YOUR_RPC_URL" --etherscan-api-key "YOUR_API_KEY"
+```
+
 Deploy to Anvil:
 
 ```sh
