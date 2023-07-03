@@ -232,6 +232,319 @@ contract SwapPermit2AdapterTest is PRBTest, StdUtils {
     assertEq(tokenOut.balanceOf(alice), _expectedBalanceAlice, "Token out not sent to alice");
     assertEq(tokenOut.balanceOf(bob), _amountOut - _expectedBalanceAlice, "Token out not sent to bob");
   }
+
+  function testFuzz_buyOrderSwap_RevertWhen_DeadlineHasPassed(uint256 _timestamp) public {
+    vm.assume(_timestamp > 0);
+    vm.warp(_timestamp);
+
+    ISwapPermit2Adapter.BuyOrderSwapParams memory _params = ISwapPermit2Adapter.BuyOrderSwapParams({
+      // Just before current timestamp
+      deadline: _timestamp - 1,
+      tokenIn: address(0),
+      maxAmountIn: 0,
+      nonce: 0,
+      signature: "",
+      allowanceTarget: address(0),
+      swapper: address(0),
+      swapData: "",
+      tokenOut: address(0),
+      amountOut: 0,
+      transferOut: Utils.buildEmptyDistribution(),
+      unspentTokenInRecipient: address(0)
+    });
+
+    vm.expectRevert(
+      abi.encodeWithSelector(IBasePermit2Adapter.TransactionDeadlinePassed.selector, _timestamp, _timestamp - 1)
+    );
+    adapter.buyOrderSwap(_params);
+  }
+
+  function testFuzz_buyOrderSwap_NativeToERC20(uint256 _amountIn, uint256 _amountOut) public {
+    vm.deal(alice, _amountIn);
+    tokenOut.mint(address(swapper), _amountOut);
+
+    // Prepare execution
+    ISwapPermit2Adapter.BuyOrderSwapParams memory _params = ISwapPermit2Adapter.BuyOrderSwapParams({
+      deadline: type(uint256).max,
+      tokenIn: address(0),
+      maxAmountIn: _amountIn,
+      nonce: 0,
+      signature: "",
+      allowanceTarget: address(0),
+      swapper: address(swapper),
+      swapData: abi.encodeWithSelector(swapper.swap.selector, address(0), _amountIn, address(tokenOut), _amountOut),
+      tokenOut: address(tokenOut),
+      amountOut: _amountOut,
+      transferOut: Utils.buildDistribution(alice),
+      unspentTokenInRecipient: address(0)
+    });
+
+    // Prepare call assertions
+    vm.expectCall(
+      address(permit2),
+      // solhint-disable-next-line max-line-length
+      abi.encodeWithSignature("permitTransferFrom(((address,uint256),uint256,uint256),(address,uint256),address,bytes)"),
+      0
+    ); // Permit2 was not called
+    vm.expectCall(address(tokenIn), abi.encodeWithSelector(tokenIn.approve.selector), 0); // Approve was not called
+    vm.expectCall(address(tokenIn), abi.encodeWithSelector(tokenIn.transfer.selector), 0); // Transfer was not called
+
+    // Execute
+    vm.prank(alice);
+    (uint256 _returnAmountIn, uint256 _returnAmountOut) = adapter.buyOrderSwap{ value: _amountIn }(_params);
+
+    // Assertions
+    assertEq(alice.balance, 0, "Token in not taken from alice");
+    assertEq(address(swapper).balance, _amountIn, "Token in not sent to swapper");
+    assertEq(tokenOut.balanceOf(address(swapper)), 0, "Token out not taken from swapper");
+    assertEq(tokenOut.balanceOf(alice), _amountOut, "Token out not sent to alice");
+    assertEq(_returnAmountIn, _amountIn, "Invalid returned value for amount in");
+    assertEq(_returnAmountOut, _amountOut, "Invalid return value for amount out");
+  }
+
+  function testFuzz_buyOrderSwap_RevertWhen_NativeToERC20DoesNotReturnEnoughTokenOut(
+    uint256 _amountIn,
+    uint256 _amountOut
+  )
+    public
+  {
+    _amountOut = bound(_amountOut, 0, type(uint256).max - 1);
+
+    vm.deal(alice, _amountIn);
+    tokenOut.mint(address(swapper), _amountOut);
+
+    // Prepare execution
+    ISwapPermit2Adapter.BuyOrderSwapParams memory _params = ISwapPermit2Adapter.BuyOrderSwapParams({
+      deadline: type(uint256).max,
+      tokenIn: address(0),
+      maxAmountIn: _amountIn,
+      nonce: 0,
+      signature: "",
+      allowanceTarget: address(0),
+      swapper: address(swapper),
+      swapData: abi.encodeWithSelector(swapper.swap.selector, address(0), _amountIn, address(tokenOut), _amountOut),
+      tokenOut: address(tokenOut),
+      amountOut: _amountOut + 1,
+      transferOut: Utils.buildDistribution(alice),
+      unspentTokenInRecipient: address(0)
+    });
+
+    // Prepare expectations and execute
+    vm.expectRevert(
+      abi.encodeWithSelector(ISwapPermit2Adapter.ReceivedTooLittleTokenOut.selector, _amountOut, _amountOut + 1)
+    );
+    vm.prank(alice);
+    adapter.buyOrderSwap{ value: _amountIn }(_params);
+  }
+
+  function testFuzz_buyOrderSwap_ERC20ToNative(
+    uint256 _amountIn,
+    uint256 _amountOut,
+    uint256 _nonce,
+    bytes calldata _signature
+  )
+    public
+  {
+    tokenIn.mint(alice, _amountIn);
+    vm.deal(address(swapper), _amountOut);
+
+    // Prepare execution
+    ISwapPermit2Adapter.BuyOrderSwapParams memory _params = ISwapPermit2Adapter.BuyOrderSwapParams({
+      deadline: type(uint256).max,
+      tokenIn: address(tokenIn),
+      maxAmountIn: _amountIn,
+      nonce: _nonce,
+      signature: _signature,
+      allowanceTarget: address(swapper),
+      swapper: address(swapper),
+      swapData: abi.encodeWithSelector(swapper.swap.selector, address(tokenIn), _amountIn, address(0), _amountOut),
+      tokenOut: address(0),
+      amountOut: _amountOut,
+      transferOut: Utils.buildDistribution(alice),
+      unspentTokenInRecipient: address(0)
+    });
+
+    // Execute
+    vm.prank(alice);
+    (uint256 _returnAmountIn, uint256 _returnAmountOut) = adapter.buyOrderSwap(_params);
+
+    // Assertions
+    assertEq(tokenIn.balanceOf(alice), 0, "Token in not taken from alice");
+    assertEq(tokenIn.balanceOf(address(swapper)), _amountIn, "Token in not sent to swapper");
+    assertEq(address(swapper).balance, 0, "Token out not taken from swapper");
+    assertEq(alice.balance, _amountOut, "Token out not sent to alice");
+    assertEq(_returnAmountIn, _amountIn, "Invalid returned value for amount in");
+    assertEq(_returnAmountOut, _amountOut, "Invalid return value for amount out");
+  }
+
+  function testFuzz_buyOrderSwap_RevertWhen_ERC20ToNativeDoesNotReturnEnoughTokenOut(
+    uint256 _amountIn,
+    uint256 _amountOut,
+    uint256 _nonce,
+    bytes calldata _signature
+  )
+    public
+  {
+    _amountOut = bound(_amountOut, 0, type(uint256).max - 1);
+
+    tokenIn.mint(alice, _amountIn);
+    vm.deal(address(swapper), _amountOut);
+
+    // Prepare execution
+    ISwapPermit2Adapter.BuyOrderSwapParams memory _params = ISwapPermit2Adapter.BuyOrderSwapParams({
+      deadline: type(uint256).max,
+      tokenIn: address(tokenIn),
+      maxAmountIn: _amountIn,
+      nonce: _nonce,
+      signature: _signature,
+      allowanceTarget: address(swapper),
+      swapper: address(swapper),
+      swapData: abi.encodeWithSelector(swapper.swap.selector, address(tokenIn), _amountIn, address(0), _amountOut),
+      tokenOut: address(0),
+      amountOut: _amountOut + 1,
+      transferOut: Utils.buildDistribution(alice),
+      unspentTokenInRecipient: address(0)
+    });
+
+    // Prepare expectations and execute
+    vm.expectRevert(
+      abi.encodeWithSelector(ISwapPermit2Adapter.ReceivedTooLittleTokenOut.selector, _amountOut, _amountOut + 1)
+    );
+    vm.prank(alice);
+    adapter.buyOrderSwap(_params);
+  }
+
+  function testFuzz_buyOrderSwap_MultipleOutRecipients(uint256 _amountIn, uint240 _amountOut) public {
+    vm.deal(alice, _amountIn);
+    tokenOut.mint(address(swapper), _amountOut);
+
+    // Prepare execution
+    ISwapPermit2Adapter.BuyOrderSwapParams memory _params = ISwapPermit2Adapter.BuyOrderSwapParams({
+      deadline: type(uint256).max,
+      tokenIn: address(0),
+      maxAmountIn: _amountIn,
+      nonce: 0,
+      signature: "",
+      allowanceTarget: address(0),
+      swapper: address(swapper),
+      swapData: abi.encodeWithSelector(swapper.swap.selector, address(0), _amountIn, address(tokenOut), _amountOut),
+      tokenOut: address(tokenOut),
+      amountOut: _amountOut,
+      transferOut: Utils.buildDistribution(alice, 2500, bob),
+      unspentTokenInRecipient: address(0)
+    });
+
+    // Execute
+    vm.prank(alice);
+    adapter.buyOrderSwap{ value: _amountIn }(_params);
+
+    // Assertions
+    uint256 _expectedBalanceAlice = uint256(_amountOut) * 25 / 100;
+    assertEq(tokenOut.balanceOf(address(swapper)), 0, "Token out not taken from swapper");
+    assertEq(tokenOut.balanceOf(alice), _expectedBalanceAlice, "Token out not sent to alice");
+    assertEq(tokenOut.balanceOf(bob), _amountOut - _expectedBalanceAlice, "Token out not sent to bob");
+  }
+
+  function testFuzz_buyOrderSwap_ReturnsUnspentNative(
+    uint256 _maxAmountIn,
+    uint256 _amountUsed,
+    uint256 _amountOut
+  )
+    public
+  {
+    vm.assume(_maxAmountIn > 1);
+    _amountUsed = bound(_amountUsed, 1, _maxAmountIn - 1);
+
+    vm.deal(alice, _maxAmountIn);
+    tokenOut.mint(address(swapper), _amountOut);
+
+    // Prepare execution
+    ISwapPermit2Adapter.BuyOrderSwapParams memory _params = ISwapPermit2Adapter.BuyOrderSwapParams({
+      deadline: type(uint256).max,
+      tokenIn: address(0),
+      maxAmountIn: _maxAmountIn,
+      nonce: 0,
+      signature: "",
+      allowanceTarget: address(0),
+      swapper: address(swapper),
+      swapData: abi.encodeWithSelector(
+        swapper.swapAndReturnUnspent.selector,
+        address(0),
+        _maxAmountIn,
+        _maxAmountIn - _amountUsed,
+        address(tokenOut),
+        _amountOut
+        ),
+      tokenOut: address(tokenOut),
+      amountOut: _amountOut,
+      transferOut: Utils.buildDistribution(alice),
+      unspentTokenInRecipient: address(0)
+    });
+
+    // Execute
+    vm.prank(alice);
+    (uint256 _returnAmountIn, uint256 _returnAmountOut) = adapter.buyOrderSwap{ value: _maxAmountIn }(_params);
+
+    // Assertions
+    assertEq(alice.balance, _maxAmountIn - _amountUsed, "Token in not taken from alice");
+    assertEq(address(swapper).balance, _amountUsed, "Token in not sent to swapper");
+    assertEq(tokenOut.balanceOf(address(swapper)), 0, "Token out not taken from swapper");
+    assertEq(tokenOut.balanceOf(alice), _amountOut, "Token out not sent to alice");
+    assertEq(_returnAmountIn, _amountUsed, "Invalid returned value for amount in");
+    assertEq(_returnAmountOut, _amountOut, "Invalid return value for amount out");
+  }
+
+  function testFuzz_buyOrderSwap_ReturnsUnspentERC20(
+    uint256 _maxAmountIn,
+    uint256 _amountUsed,
+    uint256 _amountOut,
+    uint256 _nonce,
+    bytes calldata _signature
+  )
+    public
+  {
+    vm.assume(_maxAmountIn > 1);
+    _amountUsed = bound(_amountUsed, 1, _maxAmountIn - 1);
+
+    tokenIn.mint(alice, _maxAmountIn);
+    vm.deal(address(swapper), _amountOut);
+
+    // Prepare execution
+    ISwapPermit2Adapter.BuyOrderSwapParams memory _params = ISwapPermit2Adapter.BuyOrderSwapParams({
+      deadline: type(uint256).max,
+      tokenIn: address(tokenIn),
+      maxAmountIn: _maxAmountIn,
+      nonce: _nonce,
+      signature: _signature,
+      allowanceTarget: address(swapper),
+      swapper: address(swapper),
+      swapData: abi.encodeWithSelector(
+        swapper.swapAndReturnUnspent.selector,
+        address(tokenIn),
+        _maxAmountIn,
+        _maxAmountIn - _amountUsed,
+        address(0),
+        _amountOut
+        ),
+      tokenOut: address(0),
+      amountOut: _amountOut,
+      transferOut: Utils.buildDistribution(alice),
+      unspentTokenInRecipient: bob
+    });
+
+    // Execute
+    vm.prank(alice);
+    (uint256 _returnAmountIn, uint256 _returnAmountOut) = adapter.buyOrderSwap(_params);
+
+    // Assertions
+    assertEq(tokenIn.balanceOf(alice), 0, "Token in not taken from alice");
+    assertEq(tokenIn.balanceOf(bob), _maxAmountIn - _amountUsed, "Token in not sent to bob");
+    assertEq(tokenIn.balanceOf(address(swapper)), _amountUsed, "Token in not sent to swapper");
+    assertEq(address(swapper).balance, 0, "Token out not taken from swapper");
+    assertEq(alice.balance, _amountOut, "Token out not sent to alice");
+    assertEq(_returnAmountIn, _amountUsed, "Invalid returned value for amount in");
+    assertEq(_returnAmountOut, _amountOut, "Invalid return value for amount out");
+  }
 }
 
 contract TargetSwapper {
