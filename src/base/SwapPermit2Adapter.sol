@@ -38,12 +38,11 @@ abstract contract SwapPermit2Adapter is BasePermit2Adapter, ISwapPermit2Adapter 
     // Execute swap
     _params.swapper.functionCallWithValue(_params.swapData, msg.value);
 
-    // Check min amount
-    _amountOut = _params.tokenOut.balanceOnContract();
-    if (_amountOut < _params.minAmountOut) revert ReceivedTooLittleTokenOut(_amountOut, _params.minAmountOut);
-
     // Distribute token out
-    _params.tokenOut.distributeTo(_params.transferOut);
+    _amountOut = _params.tokenOut.distributeTo(_params.transferOut);
+
+    // Check min amount
+    if (_amountOut < _params.minAmountOut) revert ReceivedTooLittleTokenOut(_amountOut, _params.minAmountOut);
 
     // Set amount in
     _amountIn = _params.amountIn;
@@ -76,12 +75,11 @@ abstract contract SwapPermit2Adapter is BasePermit2Adapter, ISwapPermit2Adapter 
     // Execute swap
     _params.swapper.functionCallWithValue(_params.swapData, msg.value);
 
-    // Check min amount
-    _amountOut = _params.tokenOut.balanceOnContract();
-    if (_amountOut < _params.amountOut) revert ReceivedTooLittleTokenOut(_amountOut, _params.amountOut);
-
     // Distribute token out
-    _params.tokenOut.distributeTo(_params.transferOut);
+    _amountOut = _params.tokenOut.distributeTo(_params.transferOut);
+
+    // Check min amount
+    if (_amountOut < _params.amountOut) revert ReceivedTooLittleTokenOut(_amountOut, _params.amountOut);
 
     // Send unspent to the set recipient
     uint256 _unspentTokenIn = _params.tokenIn.sendBalanceOnContractTo(_params.unspentTokenInRecipient);
