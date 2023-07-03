@@ -1,12 +1,14 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 pragma solidity >=0.8.0;
 
+// solhint-disable no-unused-import
 import { BasePermit2Adapter, IPermit2, Token } from "./base/BasePermit2Adapter.sol";
 import {
   IArbitraryExecutionPermit2Adapter,
   ArbitraryExecutionPermit2Adapter
 } from "./base/ArbitraryExecutionPermit2Adapter.sol";
 import { ISwapPermit2Adapter, SwapPermit2Adapter } from "./base/SwapPermit2Adapter.sol";
+// solhint-enable no-unused-import
 
 /**
  * @title Universal Permit2 Adapter

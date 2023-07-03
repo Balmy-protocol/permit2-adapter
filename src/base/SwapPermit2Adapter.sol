@@ -2,6 +2,7 @@
 pragma solidity >=0.8.0;
 
 import { Address } from "@openzeppelin/contracts/utils/Address.sol";
+// solhint-disable-next-line no-unused-import
 import { Permit2Transfers, IPermit2 } from "../libraries/Permit2Transfers.sol";
 import { Token } from "../libraries/Token.sol";
 import { ISwapPermit2Adapter } from "../interfaces/ISwapPermit2Adapter.sol";
