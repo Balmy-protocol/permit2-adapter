@@ -76,6 +76,9 @@ abstract contract SwapPermit2Adapter is BasePermit2Adapter, ISwapPermit2Adapter 
     // Execute swap
     _params.swapper.functionCallWithValue(_params.swapData, msg.value);
 
+    // Check balance for unspent tokens
+    uint256 _unspentTokenIn = _params.tokenIn.balanceOnContract();
+
     // Distribute token out
     _amountOut = _params.tokenOut.distributeTo(_params.transferOut);
 
@@ -83,7 +86,7 @@ abstract contract SwapPermit2Adapter is BasePermit2Adapter, ISwapPermit2Adapter 
     if (_amountOut < _params.amountOut) revert ReceivedTooLittleTokenOut(_amountOut, _params.amountOut);
 
     // Send unspent to the set recipient
-    uint256 _unspentTokenIn = _params.tokenIn.sendBalanceOnContractTo(_params.unspentTokenInRecipient);
+    _params.tokenIn.sendAmountTo(_unspentTokenIn, _params.unspentTokenInRecipient);
 
     // Set amount in
     _amountIn = _params.maxAmountIn - _unspentTokenIn;
