@@ -95,12 +95,8 @@ contract SwapPermit2AdapterTest is PRBTest, StdUtils {
     assertEq(_returnAmountOut, _amountOut, "Invalid return value for amount out");
   }
 
-  function testFuzz_sellOrderSwap_RevertWhen_NativeAmountIsInvalid(
-    uint256 _amountIn,
-    uint256 _expectedAmountIn
-  )
-    public
-  {
+  // solhint-disable-next-line max-line-length
+  function testFuzz_sellOrderSwap_RevertWhen_NativeAmountIsInvalid(uint256 _amountIn, uint256 _expectedAmountIn) public {
     vm.assume(_amountIn != _expectedAmountIn);
     vm.deal(alice, _amountIn);
 
@@ -120,9 +116,8 @@ contract SwapPermit2AdapterTest is PRBTest, StdUtils {
     });
 
     // Prepare expectations and execute
-    vm.expectRevert(
-      abi.encodeWithSelector(Permit2Transfers.InvalidNativeAmount.selector, _amountIn, _expectedAmountIn)
-    );
+    // solhint-disable-next-line max-line-length
+    vm.expectRevert(abi.encodeWithSelector(Permit2Transfers.InvalidNativeAmount.selector, _amountIn, _expectedAmountIn));
     vm.prank(alice);
     adapter.sellOrderSwap{ value: _amountIn }(_params);
   }
@@ -335,12 +330,7 @@ contract SwapPermit2AdapterTest is PRBTest, StdUtils {
     assertEq(_returnAmountOut, _amountOut, "Invalid return value for amount out");
   }
 
-  function testFuzz_buyOrderSwap_RevertWhen_NativeAmountIsInvalid(
-    uint256 _amountIn,
-    uint256 _expectedAmountIn
-  )
-    public
-  {
+  function testFuzz_buyOrderSwap_RevertWhen_NativeAmountIsInvalid(uint256 _amountIn, uint256 _expectedAmountIn) public {
     vm.assume(_amountIn != _expectedAmountIn);
     vm.deal(alice, _amountIn);
 
@@ -361,9 +351,8 @@ contract SwapPermit2AdapterTest is PRBTest, StdUtils {
     });
 
     // Prepare expectations and execute
-    vm.expectRevert(
-      abi.encodeWithSelector(Permit2Transfers.InvalidNativeAmount.selector, _amountIn, _expectedAmountIn)
-    );
+    // solhint-disable-next-line max-line-length
+    vm.expectRevert(abi.encodeWithSelector(Permit2Transfers.InvalidNativeAmount.selector, _amountIn, _expectedAmountIn));
     vm.prank(alice);
     adapter.buyOrderSwap{ value: _amountIn }(_params);
   }

@@ -10,7 +10,6 @@ import { Token } from "./Token.sol";
  * @notice A small library to call Permit2's transfer from methods
  */
 library Permit2Transfers {
-
   /**
    * @notice Thrown when received an inexpected amount of native token
    * @param received The amount of native token received
