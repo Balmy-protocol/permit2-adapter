@@ -90,7 +90,7 @@ contract ArbitraryExecutionPermit2AdapterTest is PRBTest, StdUtils {
     (bytes[] memory _executionResults, uint256[] memory _tokenBalances) = adapter.executeWithPermit{
       value: _nativeAmount
     }(
-      Utils.buildEmptyPermit(),
+      Utils.buildNativePermitWithAmount(_nativeAmount),
       Utils.buildEmptyAllowanceTargets(),
       Utils.buildContractCalls(_target, _data, _nativeAmount),
       Utils.buildTransferOut(address(tokenOut), Utils.buildDistribution(alice, 2500, bob)),

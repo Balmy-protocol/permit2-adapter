@@ -7,6 +7,7 @@ import { IBasePermit2Adapter } from "./IBasePermit2Adapter.sol";
 interface ISwapPermit2Adapter is IBasePermit2Adapter {
   /**
    * @notice Thrown when the swap produced less token out than expected
+   * @param received The amount of token out received
    * @param expected The amount of token out expected
    */
   error ReceivedTooLittleTokenOut(uint256 received, uint256 expected);

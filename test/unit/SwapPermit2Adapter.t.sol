@@ -5,6 +5,7 @@ import { PRBTest } from "@prb/test/PRBTest.sol";
 import { StdUtils } from "forge-std/StdUtils.sol";
 import { ISwapPermit2Adapter, Token } from "../../src/interfaces/ISwapPermit2Adapter.sol";
 import { IBasePermit2Adapter } from "../../src/interfaces/IBasePermit2Adapter.sol";
+import { Permit2Transfers } from "../../src/libraries/Permit2Transfers.sol";
 import { MockPermit2 } from "./mocks/MockPermit2.sol";
 import { MockERC20 } from "./mocks/MockERC20.sol";
 import { SwapPermit2AdapterInstance } from "./instances/SwapPermit2AdapterInstance.sol";
@@ -92,6 +93,38 @@ contract SwapPermit2AdapterTest is PRBTest, StdUtils {
     assertEq(tokenOut.balanceOf(alice), _amountOut, "Token out not sent to alice");
     assertEq(_returnAmountIn, _amountIn, "Invalid returned value for amount in");
     assertEq(_returnAmountOut, _amountOut, "Invalid return value for amount out");
+  }
+
+  function testFuzz_sellOrderSwap_RevertWhen_NativeAmountIsInvalid(
+    uint256 _amountIn,
+    uint256 _expectedAmountIn
+  )
+    public
+  {
+    vm.assume(_amountIn != _expectedAmountIn);
+    vm.deal(alice, _amountIn);
+
+    // Prepare execution
+    ISwapPermit2Adapter.SellOrderSwapParams memory _params = ISwapPermit2Adapter.SellOrderSwapParams({
+      deadline: type(uint256).max,
+      tokenIn: address(0),
+      amountIn: _expectedAmountIn,
+      nonce: 0,
+      signature: "",
+      allowanceTarget: address(0),
+      swapper: address(swapper),
+      swapData: abi.encodeWithSelector(swapper.swap.selector, address(0), _amountIn, address(tokenOut), 0),
+      tokenOut: address(tokenOut),
+      minAmountOut: 0,
+      transferOut: Utils.buildDistribution(alice)
+    });
+
+    // Prepare expectations and execute
+    vm.expectRevert(
+      abi.encodeWithSelector(Permit2Transfers.InvalidNativeAmount.selector, _amountIn, _expectedAmountIn)
+    );
+    vm.prank(alice);
+    adapter.sellOrderSwap{ value: _amountIn }(_params);
   }
 
   function testFuzz_sellOrderSwap_RevertWhen_NativeToERC20DoesNotReturnEnoughTokenOut(
@@ -300,6 +333,39 @@ contract SwapPermit2AdapterTest is PRBTest, StdUtils {
     assertEq(tokenOut.balanceOf(alice), _amountOut, "Token out not sent to alice");
     assertEq(_returnAmountIn, _amountIn, "Invalid returned value for amount in");
     assertEq(_returnAmountOut, _amountOut, "Invalid return value for amount out");
+  }
+
+  function testFuzz_buyOrderSwap_RevertWhen_NativeAmountIsInvalid(
+    uint256 _amountIn,
+    uint256 _expectedAmountIn
+  )
+    public
+  {
+    vm.assume(_amountIn != _expectedAmountIn);
+    vm.deal(alice, _amountIn);
+
+    // Prepare execution
+    ISwapPermit2Adapter.BuyOrderSwapParams memory _params = ISwapPermit2Adapter.BuyOrderSwapParams({
+      deadline: type(uint256).max,
+      tokenIn: address(0),
+      maxAmountIn: _expectedAmountIn,
+      nonce: 0,
+      signature: "",
+      allowanceTarget: address(0),
+      swapper: address(swapper),
+      swapData: abi.encodeWithSelector(swapper.swap.selector, address(0), _amountIn, address(tokenOut), 0),
+      tokenOut: address(tokenOut),
+      amountOut: 0,
+      transferOut: Utils.buildDistribution(alice),
+      unspentTokenInRecipient: address(0)
+    });
+
+    // Prepare expectations and execute
+    vm.expectRevert(
+      abi.encodeWithSelector(Permit2Transfers.InvalidNativeAmount.selector, _amountIn, _expectedAmountIn)
+    );
+    vm.prank(alice);
+    adapter.buyOrderSwap{ value: _amountIn }(_params);
   }
 
   function testFuzz_buyOrderSwap_RevertWhen_NativeToERC20DoesNotReturnEnoughTokenOut(
