@@ -18,6 +18,14 @@ library Utils {
   // solhint-disable-next-line no-empty-blocks
   function buildEmptyPermit() internal pure returns (IArbitraryExecutionPermit2Adapter.SinglePermit memory) { }
 
+  function buildNativePermitWithAmount(uint256 _amount)
+    internal
+    pure
+    returns (IArbitraryExecutionPermit2Adapter.SinglePermit memory _permit)
+  {
+    _permit.amount = _amount;
+  }
+
   function buildPermit(
     address _token,
     uint256 _amount,

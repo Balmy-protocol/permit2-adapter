@@ -11,6 +11,13 @@ import { Token } from "./Token.sol";
  */
 library Permit2Transfers {
   /**
+   * @notice Thrown when received an inexpected amount of native token
+   * @param received The amount of native token received
+   * @param expected The amount of token out expected
+   */
+  error InvalidNativeAmount(uint256 received, uint256 expected);
+
+  /**
    * @notice Executes a transfer from using Permit2
    * @param _permit2 The Permit2 contract
    * @param _token The token to transfer
@@ -47,6 +54,8 @@ library Permit2Transfers {
         // the EIP712 hash of `permit`.
         _signature
       );
+    } else if (msg.value != _amount) {
+      revert InvalidNativeAmount(msg.value, _amount);
     }
   }
 
