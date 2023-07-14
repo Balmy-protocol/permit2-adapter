@@ -70,8 +70,8 @@ interface ISwapPermit2Adapter is IBasePermit2Adapter {
   /**
    * @notice Executes a sell order swap by proxing to another contract, but using Permit2 to transfer tokens from the
    * caller
-   * @dev The idea behind this function is to have a way to simulate a swap and get both the amount out, and the gas
-   * spent on the swap. All in one call
+   * @dev Not meant to be used on-chain! The idea behind this function is to have a way to simulate a swap and get
+   *      amount in spent, the amount out received, and the gas spent on the swap. All in one RPC call
    * @param params The swap's data, such as tokens, amounts, recipient, etc
    * @return amountIn The amount ot `token in` spent on the swap
    * @return amountOut The amount of `token out` produced by the proxied swap
@@ -97,8 +97,8 @@ interface ISwapPermit2Adapter is IBasePermit2Adapter {
   /**
    * @notice Executes a buy order swap by proxing to another contract, but using Permit2 to transfer tokens from the
    * caller
-   * @dev The idea behind this function is to have a way to simulate a swap and get both the amount out, and the gas
-   * spent on the swap. All in one call
+   * @dev Not meant to be used on-chain! The idea behind this function is to have a way to simulate a swap and get
+   *      amount in spent, the amount out received, and the gas spent on the swap. All in one RPC call
    * @param params The swap's data, such as tokens, amounts, recipient, etc
    * @return amountIn The amount ot `token in` spent on the swap
    * @return amountOut The amount of `token out` produced by the proxied swap
