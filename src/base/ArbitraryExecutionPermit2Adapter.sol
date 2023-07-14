@@ -19,7 +19,8 @@ import { BasePermit2Adapter } from "./BasePermit2Adapter.sol";
  */
 abstract contract ArbitraryExecutionPermit2Adapter is BasePermit2Adapter, IArbitraryExecutionPermit2Adapter {
   using Permit2Transfers for IPermit2;
-  using Token for *;
+  using Token for address;
+  using Token for IERC20;
   using Address for address;
 
   /// @inheritdoc IArbitraryExecutionPermit2Adapter
