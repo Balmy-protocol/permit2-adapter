@@ -74,9 +74,8 @@ library Token {
     for (uint256 i; i < _distribution.length - 1;) {
       uint256 _toSend = _available * _distribution[i].shareBps / 10_000;
       sendAmountTo(_token, _toSend, _distribution[i].recipient);
+      _amountLeft -= _toSend;
       unchecked {
-        // We know that _toSend <= _amountLeft because if it wasn't, sendAmountTo would have reverted
-        _amountLeft -= _toSend;
         ++i;
       }
     }
