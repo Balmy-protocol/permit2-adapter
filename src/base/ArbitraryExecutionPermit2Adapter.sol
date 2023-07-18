@@ -83,6 +83,14 @@ abstract contract ArbitraryExecutionPermit2Adapter is BasePermit2Adapter, IArbit
       }
     }
 
+    // Reset allowance to prevent attacks. Also, we are setting it to 1 instead of 0 for gas optimization
+    for (uint256 i; i < _allowanceTargets.length;) {
+      IERC20(_allowanceTargets[i].token).setAllowance(_allowanceTargets[i].allowanceTarget, 1);
+      unchecked {
+        ++i;
+      }
+    }
+
     // Distribute tokens
     _tokenBalances = new uint256[](_transferOut.length);
     for (uint256 i; i < _transferOut.length;) {

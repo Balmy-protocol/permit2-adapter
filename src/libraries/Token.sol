@@ -37,8 +37,18 @@ library Token {
    * @param _allowanceTarget The spender that will be approved
    */
   function maxApprove(IERC20 _token, address _allowanceTarget) internal {
+    setAllowance(_token, _allowanceTarget, type(uint256).max);
+  }
+
+  /**
+   * @notice Performs an approval to the allowance target, for the given token and amount
+   * @param _token The token to approve
+   * @param _allowanceTarget The spender that will be approved
+   * @param _amount The allowance to set
+   */
+  function setAllowance(IERC20 _token, address _allowanceTarget, uint256 _amount) internal {
     // This helper should handle cases like USDT. Thanks OZ!
-    _token.forceApprove(_allowanceTarget, type(uint256).max);
+    _token.forceApprove(_allowanceTarget, _amount);
   }
 
   /**
@@ -48,8 +58,19 @@ library Token {
    * @param _allowanceTarget The spender that will be approved
    */
   function maxApproveIfNecessary(address _token, address _allowanceTarget) internal {
+    setAllowanceIfNecessary(_token, _allowanceTarget, type(uint256).max);
+  }
+
+  /**
+   * @notice Performs an approval to the allowance target for the given token and amount, as long as the token is not
+   *         the native token, and the allowance target is not the zero address
+   * @param _token The token to approve
+   * @param _allowanceTarget The spender that will be approved
+   * @param _amount The allowance to set
+   */
+  function setAllowanceIfNecessary(address _token, address _allowanceTarget, uint256 _amount) internal {
     if (_token != NATIVE_TOKEN && _allowanceTarget != address(0)) {
-      maxApprove(IERC20(_token), _allowanceTarget);
+      setAllowance(IERC20(_token), _allowanceTarget, _amount);
     }
   }
 

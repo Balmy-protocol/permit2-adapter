@@ -193,6 +193,7 @@ contract SwapPermit2AdapterTest is PRBTest, StdUtils {
     assertEq(alice.balance, _amountOut, "Token out not sent to alice");
     assertEq(_returnAmountIn, _amountIn, "Invalid returned value for amount in");
     assertEq(_returnAmountOut, _amountOut, "Invalid return value for amount out");
+    assertEq(tokenIn.allowance(address(adapter), address(swapper)), 1, "Invalid allowance");
   }
 
   function testFuzz_sellOrderSwap_RevertWhen_ERC20ToNativeDoesNotReturnEnoughTokenOut(
@@ -430,6 +431,7 @@ contract SwapPermit2AdapterTest is PRBTest, StdUtils {
     assertEq(alice.balance, _amountOut, "Token out not sent to alice");
     assertEq(_returnAmountIn, _amountIn, "Invalid returned value for amount in");
     assertEq(_returnAmountOut, _amountOut, "Invalid return value for amount out");
+    assertEq(tokenIn.allowance(address(adapter), address(swapper)), 1, "Invalid allowance");
   }
 
   function testFuzz_buyOrderSwap_RevertWhen_ERC20ToNativeDoesNotReturnEnoughTokenOut(
