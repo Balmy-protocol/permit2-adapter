@@ -143,7 +143,7 @@ contract ArbitraryExecutionPermit2AdapterTest is PRBTest, StdUtils {
     assertEq(tokenIn.balanceOf(address(target)), _tokenInAmount);
     assertEq(tokenOut.balanceOf(alice), 0);
     assertEq(tokenOut.balanceOf(bob), _tokenOutAmount);
-    assertEq(tokenIn.allowance(address(adapter), address(target)), type(uint256).max);
+    assertEq(tokenIn.allowance(address(adapter), address(target)), 1);
   }
 
   function testFuzz_executeWithBatchPermit_RevertWhen_DeadlineHasPassed(uint256 _timestamp) public {
@@ -266,7 +266,7 @@ contract ArbitraryExecutionPermit2AdapterTest is PRBTest, StdUtils {
     assertEq(tokenIn.balanceOf(address(target)), _tokenInAmount);
     assertEq(tokenOut.balanceOf(alice), 0);
     assertEq(tokenOut.balanceOf(bob), _tokenOutAmount);
-    assertEq(tokenIn.allowance(address(adapter), address(target)), type(uint256).max);
+    assertEq(tokenIn.allowance(address(adapter), address(target)), 1);
   }
 }
 

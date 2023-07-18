@@ -45,6 +45,9 @@ abstract contract SwapPermit2Adapter is BasePermit2Adapter, ISwapPermit2Adapter 
     // Check min amount
     if (_amountOut < _params.minAmountOut) revert ReceivedTooLittleTokenOut(_amountOut, _params.minAmountOut);
 
+    // Reset allowance
+    _params.tokenIn.setAllowanceIfNecessary(_params.allowanceTarget, 1);
+
     // Set amount in
     _amountIn = _params.amountIn;
   }
@@ -87,6 +90,9 @@ abstract contract SwapPermit2Adapter is BasePermit2Adapter, ISwapPermit2Adapter 
 
     // Send unspent to the set recipient
     _params.tokenIn.sendAmountTo(_unspentTokenIn, _params.unspentTokenInRecipient);
+
+    // Reset allowance
+    _params.tokenIn.setAllowanceIfNecessary(_params.allowanceTarget, 1);
 
     // Set amount in
     _amountIn = _params.maxAmountIn - _unspentTokenIn;
