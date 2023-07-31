@@ -79,5 +79,4 @@ interface ISwapPermit2Adapter is IBasePermit2Adapter {
     external
     payable
     returns (uint256 amountIn, uint256 amountOut);
-
 }

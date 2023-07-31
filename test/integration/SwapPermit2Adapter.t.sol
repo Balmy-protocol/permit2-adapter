@@ -90,9 +90,7 @@ contract SwapPermit2AdapterTest is PRBTest, StdCheats {
 
     // Execute
     vm.prank(alice);
-    (uint256 _returnedAmountIn, uint256 _returnedAmountOut) = adapter.sellOrderSwap{
-      value: _amountToSwap
-    }(
+    (uint256 _returnedAmountIn, uint256 _returnedAmountOut) = adapter.sellOrderSwap{ value: _amountToSwap }(
       ISwapPermit2Adapter.SellOrderSwapParams({
         deadline: DEADLINE,
         tokenIn: address(0),

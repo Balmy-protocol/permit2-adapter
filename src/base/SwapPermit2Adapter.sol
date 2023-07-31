@@ -86,5 +86,4 @@ abstract contract SwapPermit2Adapter is BasePermit2Adapter, ISwapPermit2Adapter 
     // Set amount in
     _amountIn = _params.maxAmountIn - _unspentTokenIn;
   }
-
 }
