@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 pragma solidity >=0.8.0;
 
+import { SimulationAdapter } from "@call-simulation/SimulationAdapter.sol";
 // solhint-disable no-unused-import
 import { BasePermit2Adapter, IPermit2, Token } from "./base/BasePermit2Adapter.sol";
 import {
@@ -19,6 +20,6 @@ import { ISwapPermit2Adapter, SwapPermit2Adapter } from "./base/SwapPermit2Adapt
  *      the only tokens approved/transferred through Permit2 should be entirely spent in the same transaction.
  *      Any unspent allowance or remaining tokens on the contract can be transferred by anyone, so please be careful!
  */
-contract UniversalPermit2Adapter is SwapPermit2Adapter, ArbitraryExecutionPermit2Adapter {
+contract UniversalPermit2Adapter is SimulationAdapter, SwapPermit2Adapter, ArbitraryExecutionPermit2Adapter {
   constructor(IPermit2 _permit2) BasePermit2Adapter(_permit2) { }
 }

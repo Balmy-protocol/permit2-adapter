@@ -50,7 +50,7 @@ contract SwapPermit2AdapterTest is PRBTest, StdCheats {
 
     // Execute
     vm.prank(alice);
-    (uint256 _returnedAmountIn, uint256 _returnedAmountOut,) = adapter.sellOrderSwapWithGasMeasurement(
+    (uint256 _returnedAmountIn, uint256 _returnedAmountOut) = adapter.sellOrderSwap(
       ISwapPermit2Adapter.SellOrderSwapParams({
         deadline: DEADLINE,
         tokenIn: address(USDC),
@@ -90,9 +90,7 @@ contract SwapPermit2AdapterTest is PRBTest, StdCheats {
 
     // Execute
     vm.prank(alice);
-    (uint256 _returnedAmountIn, uint256 _returnedAmountOut,) = adapter.sellOrderSwapWithGasMeasurement{
-      value: _amountToSwap
-    }(
+    (uint256 _returnedAmountIn, uint256 _returnedAmountOut) = adapter.sellOrderSwap{ value: _amountToSwap }(
       ISwapPermit2Adapter.SellOrderSwapParams({
         deadline: DEADLINE,
         tokenIn: address(0),
@@ -135,7 +133,7 @@ contract SwapPermit2AdapterTest is PRBTest, StdCheats {
 
     // Execute
     vm.prank(alice);
-    (uint256 _returnedAmountIn, uint256 _returnedAmountOut,) = adapter.buyOrderSwapWithGasMeasurement(
+    (uint256 _returnedAmountIn, uint256 _returnedAmountOut) = adapter.buyOrderSwap(
       ISwapPermit2Adapter.BuyOrderSwapParams({
         deadline: DEADLINE,
         tokenIn: address(DAI),

@@ -9,3 +9,6 @@
 [submodule "lib/openzeppelin-contracts"]
 	path = lib/openzeppelin-contracts
 	url = https://github.com/openzeppelin/openzeppelin-contracts
+[submodule "lib/call-simulation"]
+	path = lib/call-simulation
+	url = https://github.com/Mean-Finance/call-simulation

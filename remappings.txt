@@ -2,3 +2,4 @@
 forge-std/=lib/forge-std/src/
 src/=src/
 @openzeppelin/=lib/openzeppelin-contracts/
+@call-simulation/=lib/call-simulation/src
