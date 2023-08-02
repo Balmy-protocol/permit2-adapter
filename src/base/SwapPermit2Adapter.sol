@@ -37,7 +37,8 @@ abstract contract SwapPermit2Adapter is BasePermit2Adapter, ISwapPermit2Adapter 
     _params.tokenIn.maxApproveIfNecessary(_params.allowanceTarget);
 
     // Execute swap
-    _params.swapper.functionCallWithValue(_params.swapData, msg.value);
+    uint256 _value = _params.tokenIn == Token.NATIVE_TOKEN ? _params.amountIn : 0;
+    _params.swapper.functionCallWithValue(_params.swapData, _value);
 
     // Distribute token out
     _amountOut = _params.tokenOut.distributeTo(_params.transferOut);
@@ -66,7 +67,8 @@ abstract contract SwapPermit2Adapter is BasePermit2Adapter, ISwapPermit2Adapter 
     _params.tokenIn.maxApproveIfNecessary(_params.allowanceTarget);
 
     // Execute swap
-    _params.swapper.functionCallWithValue(_params.swapData, msg.value);
+    uint256 _value = _params.tokenIn == Token.NATIVE_TOKEN ? _params.maxAmountIn : 0;
+    _params.swapper.functionCallWithValue(_params.swapData, _value);
 
     // Check balance for unspent tokens
     uint256 _unspentTokenIn = _params.tokenIn.balanceOnContract();
