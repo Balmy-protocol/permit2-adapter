@@ -5,7 +5,6 @@ import { PRBTest } from "@prb/test/PRBTest.sol";
 import { StdUtils } from "forge-std/StdUtils.sol";
 import { ISwapPermit2Adapter, Token } from "../../src/interfaces/ISwapPermit2Adapter.sol";
 import { IBasePermit2Adapter } from "../../src/interfaces/IBasePermit2Adapter.sol";
-import { Permit2Transfers } from "../../src/libraries/Permit2Transfers.sol";
 import { MockPermit2 } from "./mocks/MockPermit2.sol";
 import { MockERC20 } from "./mocks/MockERC20.sol";
 import { SwapPermit2AdapterInstance } from "./instances/SwapPermit2AdapterInstance.sol";

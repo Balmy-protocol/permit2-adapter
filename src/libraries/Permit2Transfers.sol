@@ -10,7 +10,6 @@ import { Token } from "./Token.sol";
  * @notice A small library to call Permit2's transfer from methods
  */
 library Permit2Transfers {
-
   /**
    * @notice Executes a transfer from using Permit2
    * @param _permit2 The Permit2 contract
