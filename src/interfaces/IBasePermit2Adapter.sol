@@ -5,6 +5,9 @@ import { IPermit2 } from "./external/IPermit2.sol";
 
 /// @notice The interface all Permit2 adapters should implement
 interface IBasePermit2Adapter {
+  /// @notice Thrown when the user tries to execute an invalid contract call
+  error InvalidContractCall();
+
   /**
    * @notice Thrown when a transaction deadline has passed
    * @param current The current time

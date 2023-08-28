@@ -3,6 +3,7 @@ pragma solidity >=0.8.0;
 
 import { IBasePermit2Adapter, IPermit2 } from "../interfaces/IBasePermit2Adapter.sol";
 import { Token } from "../libraries/Token.sol";
+import { Address } from "@openzeppelin/contracts/utils/Address.sol";
 
 /**
  * @title Base Permit2 Adapter
@@ -10,6 +11,8 @@ import { Token } from "../libraries/Token.sol";
  * @notice The base contract for Permit2 adapters
  */
 abstract contract BasePermit2Adapter is IBasePermit2Adapter {
+  using Address for address;
+
   /// @inheritdoc IBasePermit2Adapter
   address public constant NATIVE_TOKEN = Token.NATIVE_TOKEN;
   /// @inheritdoc IBasePermit2Adapter
@@ -26,5 +29,10 @@ abstract contract BasePermit2Adapter is IBasePermit2Adapter {
   modifier checkDeadline(uint256 _deadline) {
     if (block.timestamp > _deadline) revert TransactionDeadlinePassed(block.timestamp, _deadline);
     _;
+  }
+
+  function _callContract(address _target, bytes calldata _data, uint256 _value) internal returns (bytes memory _result) {
+    if (_target == address(PERMIT2)) revert InvalidContractCall();
+    return _target.functionCallWithValue(_data, _value);
   }
 }
