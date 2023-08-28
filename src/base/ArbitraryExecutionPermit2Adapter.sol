@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 pragma solidity >=0.8.0;
 
-import { Address } from "@openzeppelin/contracts/utils/Address.sol";
 // solhint-disable-next-line no-unused-import
 import { Permit2Transfers, IPermit2 } from "../libraries/Permit2Transfers.sol";
 import { Token, IERC20 } from "../libraries/Token.sol";
@@ -21,7 +20,6 @@ abstract contract ArbitraryExecutionPermit2Adapter is BasePermit2Adapter, IArbit
   using Permit2Transfers for IPermit2;
   using Token for address;
   using Token for IERC20;
-  using Address for address;
 
   /// @inheritdoc IArbitraryExecutionPermit2Adapter
   function executeWithPermit(
@@ -76,8 +74,7 @@ abstract contract ArbitraryExecutionPermit2Adapter is BasePermit2Adapter, IArbit
     // Call contracts
     _executionResults = new bytes[](_contractCalls.length);
     for (uint256 i; i < _contractCalls.length;) {
-      _executionResults[i] =
-        _contractCalls[i].target.functionCallWithValue(_contractCalls[i].data, _contractCalls[i].value);
+      _executionResults[i] = _callContract(_contractCalls[i].target, _contractCalls[i].data, _contractCalls[i].value);
       unchecked {
         ++i;
       }

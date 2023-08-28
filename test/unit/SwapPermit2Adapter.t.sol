@@ -52,6 +52,28 @@ contract SwapPermit2AdapterTest is PRBTest, StdUtils {
     adapter.sellOrderSwap(_params);
   }
 
+  function test_sellOrderSwap_RevertWhen_CallingPermit2() public {
+    ISwapPermit2Adapter.SellOrderSwapParams memory _params = ISwapPermit2Adapter.SellOrderSwapParams({
+      // Just before current timestamp
+      deadline: type(uint256).max,
+      tokenIn: address(0),
+      amountIn: 0,
+      nonce: 0,
+      signature: "",
+      allowanceTarget: address(0),
+      swapper: address(permit2),
+      swapData: "",
+      tokenOut: address(0),
+      minAmountOut: 0,
+      transferOut: new Token.DistributionTarget[](0)
+    });
+
+    vm.expectRevert(
+      abi.encodeWithSelector(IBasePermit2Adapter.InvalidContractCall.selector)
+    );
+    adapter.sellOrderSwap(_params);
+  }
+
   function testFuzz_sellOrderSwap_NativeToERC20(uint256 _amountIn, uint256 _amountOut) public {
     vm.deal(alice, _amountIn);
     tokenOut.mint(address(swapper), _amountOut);
@@ -256,6 +278,29 @@ contract SwapPermit2AdapterTest is PRBTest, StdUtils {
 
     vm.expectRevert(
       abi.encodeWithSelector(IBasePermit2Adapter.TransactionDeadlinePassed.selector, _timestamp, _timestamp - 1)
+    );
+    adapter.buyOrderSwap(_params);
+  }
+
+  function test_buyOrderSwap_RevertWhen_CallingPermit2() public {
+    ISwapPermit2Adapter.BuyOrderSwapParams memory _params = ISwapPermit2Adapter.BuyOrderSwapParams({
+      // Just before current timestamp
+      deadline: type(uint256).max,
+      tokenIn: address(0),
+      maxAmountIn: 0,
+      nonce: 0,
+      signature: "",
+      allowanceTarget: address(0),
+      swapper: address(permit2),
+      swapData: "",
+      tokenOut: address(0),
+      amountOut: 0,
+      transferOut: Utils.buildEmptyDistribution(),
+      unspentTokenInRecipient: address(0)
+    });
+
+    vm.expectRevert(
+      abi.encodeWithSelector(IBasePermit2Adapter.InvalidContractCall.selector)
     );
     adapter.buyOrderSwap(_params);
   }

@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 pragma solidity >=0.8.0;
 
-import { Address } from "@openzeppelin/contracts/utils/Address.sol";
 // solhint-disable-next-line no-unused-import
 import { Permit2Transfers, IPermit2 } from "../libraries/Permit2Transfers.sol";
 import { Token } from "../libraries/Token.sol";
@@ -21,7 +20,6 @@ import { BasePermit2Adapter } from "./BasePermit2Adapter.sol";
 abstract contract SwapPermit2Adapter is BasePermit2Adapter, ISwapPermit2Adapter {
   using Permit2Transfers for IPermit2;
   using Token for address;
-  using Address for address;
 
   /// @inheritdoc ISwapPermit2Adapter
   function sellOrderSwap(SellOrderSwapParams calldata _params)
@@ -38,7 +36,7 @@ abstract contract SwapPermit2Adapter is BasePermit2Adapter, ISwapPermit2Adapter 
 
     // Execute swap
     uint256 _value = _params.tokenIn == Token.NATIVE_TOKEN ? _params.amountIn : 0;
-    _params.swapper.functionCallWithValue(_params.swapData, _value);
+    _callContract(_params.swapper, _params.swapData, _value);
 
     // Distribute token out
     _amountOut = _params.tokenOut.distributeTo(_params.transferOut);
@@ -68,7 +66,7 @@ abstract contract SwapPermit2Adapter is BasePermit2Adapter, ISwapPermit2Adapter 
 
     // Execute swap
     uint256 _value = _params.tokenIn == Token.NATIVE_TOKEN ? _params.maxAmountIn : 0;
-    _params.swapper.functionCallWithValue(_params.swapData, _value);
+    _callContract(_params.swapper, _params.swapData, _value);
 
     // Check balance for unspent tokens
     uint256 _unspentTokenIn = _params.tokenIn.balanceOnContract();
