@@ -163,9 +163,7 @@ contract ArbitraryExecutionPermit2AdapterTest is PRBTest, StdUtils {
   }
 
   function test_executeWithBatchPermit_RevertWhen_CallingPermit2() public {
-    vm.expectRevert(
-      abi.encodeWithSelector(IBasePermit2Adapter.InvalidContractCall.selector)
-    );
+    vm.expectRevert(abi.encodeWithSelector(IBasePermit2Adapter.InvalidContractCall.selector));
     adapter.executeWithBatchPermit(
       Utils.buildEmptyBatchPermit(),
       Utils.buildEmptyAllowanceTargets(),

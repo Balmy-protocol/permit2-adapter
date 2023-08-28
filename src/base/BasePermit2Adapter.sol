@@ -11,7 +11,6 @@ import { Address } from "@openzeppelin/contracts/utils/Address.sol";
  * @notice The base contract for Permit2 adapters
  */
 abstract contract BasePermit2Adapter is IBasePermit2Adapter {
-
   using Address for address;
 
   /// @inheritdoc IBasePermit2Adapter

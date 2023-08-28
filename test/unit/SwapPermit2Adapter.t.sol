@@ -68,9 +68,7 @@ contract SwapPermit2AdapterTest is PRBTest, StdUtils {
       transferOut: new Token.DistributionTarget[](0)
     });
 
-    vm.expectRevert(
-      abi.encodeWithSelector(IBasePermit2Adapter.InvalidContractCall.selector)
-    );
+    vm.expectRevert(abi.encodeWithSelector(IBasePermit2Adapter.InvalidContractCall.selector));
     adapter.sellOrderSwap(_params);
   }
 
@@ -299,9 +297,7 @@ contract SwapPermit2AdapterTest is PRBTest, StdUtils {
       unspentTokenInRecipient: address(0)
     });
 
-    vm.expectRevert(
-      abi.encodeWithSelector(IBasePermit2Adapter.InvalidContractCall.selector)
-    );
+    vm.expectRevert(abi.encodeWithSelector(IBasePermit2Adapter.InvalidContractCall.selector));
     adapter.buyOrderSwap(_params);
   }
 
