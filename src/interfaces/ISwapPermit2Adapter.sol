@@ -12,6 +12,28 @@ interface ISwapPermit2Adapter is IBasePermit2Adapter {
    */
   error ReceivedTooLittleTokenOut(uint256 received, uint256 expected);
 
+  /**
+   * @notice Emitted when a swap ocurrs
+   * @param caller The swap caller
+   * @param swapType The swap type, 'buy' or 'sell'
+   * @param tokenIn The token swapped
+   * @param tokenOut The token received
+   * @param amountIn The amount of token in swapped
+   * @param amountOut The amount of token out received
+   * @param swapper The aggregator address
+   * @param misc Misc bytes
+   */
+  event Swapped(
+    address caller,
+    SwapType swapType,
+    address tokenIn,
+    address tokenOut,
+    uint256 amountIn,
+    uint256 amountOut,
+    address swapper,
+    bytes misc
+  );
+
   /// @notice Swap params for a sell order
   struct SellOrderSwapParams {
     // Deadline
@@ -31,6 +53,7 @@ interface ISwapPermit2Adapter is IBasePermit2Adapter {
     uint256 minAmountOut;
     // Transfer token out
     Token.DistributionTarget[] transferOut;
+    bytes misc;
   }
 
   // @notice Swap params for a buy order
@@ -54,6 +77,12 @@ interface ISwapPermit2Adapter is IBasePermit2Adapter {
     Token.DistributionTarget[] transferOut;
     // Transfer token in
     address unspentTokenInRecipient;
+    bytes misc;
+  }
+
+  enum SwapType {
+    Buy,
+    Sell
   }
 
   /**

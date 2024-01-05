@@ -49,6 +49,18 @@ abstract contract SwapPermit2Adapter is BasePermit2Adapter, ISwapPermit2Adapter 
 
     // Set amount in
     _amountIn = _params.amountIn;
+
+    // Emit event
+    emit Swapped({
+      caller: msg.sender,
+      swapType: SwapType.Sell,
+      tokenIn: _params.tokenIn,
+      tokenOut: _params.tokenOut,
+      amountIn: _params.amountIn,
+      amountOut: _amountOut,
+      swapper: _params.swapper,
+      misc: _params.misc
+    });
   }
 
   /// @inheritdoc ISwapPermit2Adapter
@@ -85,5 +97,17 @@ abstract contract SwapPermit2Adapter is BasePermit2Adapter, ISwapPermit2Adapter 
 
     // Set amount in
     _amountIn = _params.maxAmountIn - _unspentTokenIn;
+
+    // Emit event
+    emit Swapped({
+      caller: msg.sender,
+      swapType: SwapType.Buy,
+      tokenIn: _params.tokenIn,
+      tokenOut: _params.tokenOut,
+      amountIn: _amountIn,
+      amountOut: _amountOut,
+      swapper: _params.swapper,
+      misc: _params.misc
+    });
   }
 }
