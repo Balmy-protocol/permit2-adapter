@@ -23,9 +23,9 @@ interface ISwapPermit2Adapter is IBasePermit2Adapter {
    * @param swapper The aggregator address
    * @param misc Misc bytes
    */
-  event SwapSucceded(
+  event Swapped(
     address caller,
-    string swapType,
+    SwapType swapType,
     address tokenIn,
     address tokenOut,
     uint256 amountIn,
@@ -78,6 +78,11 @@ interface ISwapPermit2Adapter is IBasePermit2Adapter {
     // Transfer token in
     address unspentTokenInRecipient;
     bytes misc;
+  }
+
+  enum SwapType {
+    Buy,
+    Sell
   }
 
   /**

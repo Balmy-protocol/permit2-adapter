@@ -11,9 +11,9 @@ import { SwapPermit2AdapterInstance } from "./instances/SwapPermit2AdapterInstan
 import { Utils } from "../Utils.sol";
 
 contract SwapPermit2AdapterTest is PRBTest, StdUtils {
-  event SwapSucceded(
+  event Swapped(
     address caller,
-    string swapType,
+    ISwapPermit2Adapter.SwapType swapType,
     address tokenIn,
     address tokenOut,
     uint256 amountIn,
@@ -117,9 +117,9 @@ contract SwapPermit2AdapterTest is PRBTest, StdUtils {
 
     // Expect event
     vm.expectEmit();
-    emit SwapSucceded({
+    emit Swapped({
       caller: address(alice),
-      swapType: "sell",
+      swapType: ISwapPermit2Adapter.SwapType.Sell,
       tokenIn: _params.tokenIn,
       tokenOut: _params.tokenOut,
       amountIn: _params.amountIn,
@@ -205,9 +205,9 @@ contract SwapPermit2AdapterTest is PRBTest, StdUtils {
 
     // Expect event
     vm.expectEmit();
-    emit SwapSucceded({
+    emit Swapped({
       caller: address(alice),
-      swapType: "sell",
+      swapType: ISwapPermit2Adapter.SwapType.Sell,
       tokenIn: _params.tokenIn,
       tokenOut: _params.tokenOut,
       amountIn: _params.amountIn,
@@ -380,9 +380,9 @@ contract SwapPermit2AdapterTest is PRBTest, StdUtils {
 
     // Expect event
     vm.expectEmit();
-    emit SwapSucceded({
+    emit Swapped({
       caller: address(alice),
-      swapType: "buy",
+      swapType: ISwapPermit2Adapter.SwapType.Buy,
       tokenIn: _params.tokenIn,
       tokenOut: _params.tokenOut,
       amountIn: _amountIn,
@@ -470,9 +470,9 @@ contract SwapPermit2AdapterTest is PRBTest, StdUtils {
 
     // Expect event
     vm.expectEmit();
-    emit SwapSucceded({
+    emit Swapped({
       caller: address(alice),
-      swapType: "buy",
+      swapType: ISwapPermit2Adapter.SwapType.Buy,
       tokenIn: _params.tokenIn,
       tokenOut: _params.tokenOut,
       amountIn: _amountIn,
