@@ -11,6 +11,17 @@ import { SwapPermit2AdapterInstance } from "./instances/SwapPermit2AdapterInstan
 import { Utils } from "../Utils.sol";
 
 contract SwapPermit2AdapterTest is PRBTest, StdUtils {
+  event SwapSucceded(
+    address caller,
+    string swapType,
+    address tokenIn,
+    address tokenOut,
+    uint256 amountIn,
+    uint256 amountOut,
+    address swapper,
+    bytes misc
+  );
+
   address internal alice = address(1);
   address internal bob = address(2);
   MockPermit2 internal permit2;
@@ -43,7 +54,8 @@ contract SwapPermit2AdapterTest is PRBTest, StdUtils {
       swapData: "",
       tokenOut: address(0),
       minAmountOut: 0,
-      transferOut: new Token.DistributionTarget[](0)
+      transferOut: new Token.DistributionTarget[](0),
+      misc: ""
     });
 
     vm.expectRevert(
@@ -65,7 +77,8 @@ contract SwapPermit2AdapterTest is PRBTest, StdUtils {
       swapData: "",
       tokenOut: address(0),
       minAmountOut: 0,
-      transferOut: new Token.DistributionTarget[](0)
+      transferOut: new Token.DistributionTarget[](0),
+      misc: ""
     });
 
     vm.expectRevert(abi.encodeWithSelector(IBasePermit2Adapter.InvalidContractCall.selector));
@@ -88,7 +101,8 @@ contract SwapPermit2AdapterTest is PRBTest, StdUtils {
       swapData: abi.encodeWithSelector(swapper.swap.selector, address(0), _amountIn, address(tokenOut), _amountOut),
       tokenOut: address(tokenOut),
       minAmountOut: _amountOut,
-      transferOut: Utils.buildDistribution(alice)
+      transferOut: Utils.buildDistribution(alice),
+      misc: ""
     });
 
     // Prepare call assertions
@@ -100,6 +114,19 @@ contract SwapPermit2AdapterTest is PRBTest, StdUtils {
     ); // Permit2 was not called
     vm.expectCall(address(tokenIn), abi.encodeWithSelector(tokenIn.approve.selector), 0); // Approve was not called
     vm.expectCall(address(tokenIn), abi.encodeWithSelector(tokenIn.transfer.selector), 0); // Transfer was not called
+
+    // Expect event
+    vm.expectEmit();
+    emit SwapSucceded({
+      caller: address(alice),
+      swapType: "sell",
+      tokenIn: _params.tokenIn,
+      tokenOut: _params.tokenOut,
+      amountIn: _params.amountIn,
+      amountOut: _amountOut,
+      swapper: _params.swapper,
+      misc: _params.misc
+    });
 
     // Execute
     vm.prank(alice);
@@ -137,7 +164,8 @@ contract SwapPermit2AdapterTest is PRBTest, StdUtils {
       swapData: abi.encodeWithSelector(swapper.swap.selector, address(0), _amountIn, address(tokenOut), _amountOut),
       tokenOut: address(tokenOut),
       minAmountOut: _amountOut + 1,
-      transferOut: Utils.buildDistribution(alice)
+      transferOut: Utils.buildDistribution(alice),
+      misc: ""
     });
 
     // Prepare expectations and execute
@@ -171,7 +199,21 @@ contract SwapPermit2AdapterTest is PRBTest, StdUtils {
       swapData: abi.encodeWithSelector(swapper.swap.selector, address(tokenIn), _amountIn, address(0), _amountOut),
       tokenOut: address(0),
       minAmountOut: _amountOut,
-      transferOut: Utils.buildDistribution(alice)
+      transferOut: Utils.buildDistribution(alice),
+      misc: ""
+    });
+
+    // Expect event
+    vm.expectEmit();
+    emit SwapSucceded({
+      caller: address(alice),
+      swapType: "sell",
+      tokenIn: _params.tokenIn,
+      tokenOut: _params.tokenOut,
+      amountIn: _params.amountIn,
+      amountOut: _amountOut,
+      swapper: _params.swapper,
+      misc: _params.misc
     });
 
     // Execute
@@ -213,7 +255,8 @@ contract SwapPermit2AdapterTest is PRBTest, StdUtils {
       swapData: abi.encodeWithSelector(swapper.swap.selector, address(tokenIn), _amountIn, address(0), _amountOut),
       tokenOut: address(0),
       minAmountOut: _amountOut + 1,
-      transferOut: Utils.buildDistribution(alice)
+      transferOut: Utils.buildDistribution(alice),
+      misc: ""
     });
 
     // Prepare expectations and execute
@@ -240,7 +283,8 @@ contract SwapPermit2AdapterTest is PRBTest, StdUtils {
       swapData: abi.encodeWithSelector(swapper.swap.selector, address(0), _amountIn, address(tokenOut), _amountOut),
       tokenOut: address(tokenOut),
       minAmountOut: _amountOut,
-      transferOut: Utils.buildDistribution(address(0), 2500, bob)
+      transferOut: Utils.buildDistribution(address(0), 2500, bob),
+      misc: ""
     });
 
     // Execute
@@ -271,7 +315,8 @@ contract SwapPermit2AdapterTest is PRBTest, StdUtils {
       tokenOut: address(0),
       amountOut: 0,
       transferOut: Utils.buildEmptyDistribution(),
-      unspentTokenInRecipient: address(0)
+      unspentTokenInRecipient: address(0),
+      misc: ""
     });
 
     vm.expectRevert(
@@ -294,7 +339,8 @@ contract SwapPermit2AdapterTest is PRBTest, StdUtils {
       tokenOut: address(0),
       amountOut: 0,
       transferOut: Utils.buildEmptyDistribution(),
-      unspentTokenInRecipient: address(0)
+      unspentTokenInRecipient: address(0),
+      misc: ""
     });
 
     vm.expectRevert(abi.encodeWithSelector(IBasePermit2Adapter.InvalidContractCall.selector));
@@ -318,7 +364,8 @@ contract SwapPermit2AdapterTest is PRBTest, StdUtils {
       tokenOut: address(tokenOut),
       amountOut: _amountOut,
       transferOut: Utils.buildDistribution(alice),
-      unspentTokenInRecipient: address(0)
+      unspentTokenInRecipient: address(0),
+      misc: ""
     });
 
     // Prepare call assertions
@@ -330,6 +377,19 @@ contract SwapPermit2AdapterTest is PRBTest, StdUtils {
     ); // Permit2 was not called
     vm.expectCall(address(tokenIn), abi.encodeWithSelector(tokenIn.approve.selector), 0); // Approve was not called
     vm.expectCall(address(tokenIn), abi.encodeWithSelector(tokenIn.transfer.selector), 0); // Transfer was not called
+
+    // Expect event
+    vm.expectEmit();
+    emit SwapSucceded({
+      caller: address(alice),
+      swapType: "buy",
+      tokenIn: _params.tokenIn,
+      tokenOut: _params.tokenOut,
+      amountIn: _amountIn,
+      amountOut: _amountOut,
+      swapper: _params.swapper,
+      misc: _params.misc
+    });
 
     // Execute
     vm.prank(alice);
@@ -368,7 +428,8 @@ contract SwapPermit2AdapterTest is PRBTest, StdUtils {
       tokenOut: address(tokenOut),
       amountOut: _amountOut + 1,
       transferOut: Utils.buildDistribution(alice),
-      unspentTokenInRecipient: address(0)
+      unspentTokenInRecipient: address(0),
+      misc: ""
     });
 
     // Prepare expectations and execute
@@ -403,7 +464,21 @@ contract SwapPermit2AdapterTest is PRBTest, StdUtils {
       tokenOut: address(0),
       amountOut: _amountOut,
       transferOut: Utils.buildDistribution(alice),
-      unspentTokenInRecipient: address(0)
+      unspentTokenInRecipient: address(0),
+      misc: ""
+    });
+
+    // Expect event
+    vm.expectEmit();
+    emit SwapSucceded({
+      caller: address(alice),
+      swapType: "buy",
+      tokenIn: _params.tokenIn,
+      tokenOut: _params.tokenOut,
+      amountIn: _amountIn,
+      amountOut: _amountOut,
+      swapper: _params.swapper,
+      misc: _params.misc
     });
 
     // Execute
@@ -446,7 +521,8 @@ contract SwapPermit2AdapterTest is PRBTest, StdUtils {
       tokenOut: address(0),
       amountOut: _amountOut + 1,
       transferOut: Utils.buildDistribution(alice),
-      unspentTokenInRecipient: address(0)
+      unspentTokenInRecipient: address(0),
+      misc: ""
     });
 
     // Prepare expectations and execute
@@ -474,7 +550,8 @@ contract SwapPermit2AdapterTest is PRBTest, StdUtils {
       tokenOut: address(tokenOut),
       amountOut: _amountOut,
       transferOut: Utils.buildDistribution(alice, 2500, bob),
-      unspentTokenInRecipient: address(0)
+      unspentTokenInRecipient: address(0),
+      misc: ""
     });
 
     // Execute
@@ -521,7 +598,8 @@ contract SwapPermit2AdapterTest is PRBTest, StdUtils {
       tokenOut: address(tokenOut),
       amountOut: _amountOut,
       transferOut: Utils.buildDistribution(alice),
-      unspentTokenInRecipient: address(0)
+      unspentTokenInRecipient: address(0),
+      misc: ""
     });
 
     // Execute
@@ -572,7 +650,8 @@ contract SwapPermit2AdapterTest is PRBTest, StdUtils {
       tokenOut: address(0),
       amountOut: _amountOut,
       transferOut: Utils.buildDistribution(alice),
-      unspentTokenInRecipient: bob
+      unspentTokenInRecipient: bob,
+      misc: ""
     });
 
     // Execute

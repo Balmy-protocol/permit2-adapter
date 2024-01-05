@@ -62,8 +62,9 @@ contract SwapPermit2AdapterTest is PRBTest, StdCheats {
         swapData: _swapData,
         tokenOut: Token.NATIVE_TOKEN,
         minAmountOut: _minAmountOut,
-        transferOut: Utils.buildDistribution(feeRecipient, 100, alice) // 1% for fee recipient, rest for alice
-       })
+        transferOut: Utils.buildDistribution(feeRecipient, 100, alice), // 1% for fee recipient, rest for alice
+        misc: ""
+      })
     );
 
     // Assertions
@@ -102,8 +103,9 @@ contract SwapPermit2AdapterTest is PRBTest, StdCheats {
         swapData: _swapData,
         tokenOut: address(USDC),
         minAmountOut: _minAmountOut,
-        transferOut: Utils.buildDistribution(feeRecipient, 100, alice) // 1% for fee recipient, rest for alice
-       })
+        transferOut: Utils.buildDistribution(feeRecipient, 100, alice), // 1% for fee recipient, rest for alice
+        misc: ""
+      })
     );
 
     // Assertions
@@ -146,8 +148,9 @@ contract SwapPermit2AdapterTest is PRBTest, StdCheats {
         tokenOut: address(USDC),
         amountOut: _amountOut,
         transferOut: Utils.buildDistribution(feeRecipient, 100, alice), // 1% for fee recipient, rest for alice
-        unspentTokenInRecipient: address(0) // Return to caller (in this case alice)
-       })
+        unspentTokenInRecipient: address(0), // Return to caller (in this case alice)
+        misc: ""
+      })
     );
 
     // Assertions
