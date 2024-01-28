@@ -1,5 +1,5 @@
 @prb/test/=lib/prb-test/src/
 forge-std/=lib/forge-std/src/
 src/=src/
-@openzeppelin/=lib/openzeppelin-contracts/
+@openzeppelin/contracts-4.8.0=lib/openzeppelin-contracts/contracts/
 @call-simulation/=lib/call-simulation/src

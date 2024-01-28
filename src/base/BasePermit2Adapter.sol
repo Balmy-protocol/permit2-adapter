@@ -3,7 +3,7 @@ pragma solidity >=0.8.0;
 
 import { IBasePermit2Adapter, IPermit2 } from "../interfaces/IBasePermit2Adapter.sol";
 import { Token } from "../libraries/Token.sol";
-import { Address } from "@openzeppelin/contracts/utils/Address.sol";
+import { Address } from "@openzeppelin/contracts-4.8.0/utils/Address.sol";
 
 /**
  * @title Base Permit2 Adapter

@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 pragma solidity >=0.8.0;
 
-import { SafeERC20, IERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import { Address } from "@openzeppelin/contracts/utils/Address.sol";
+import { SafeERC20, IERC20 } from "@openzeppelin/contracts-4.8.0/token/ERC20/utils/SafeERC20.sol";
+import { Address } from "@openzeppelin/contracts-4.8.0/utils/Address.sol";
 
 /**
  * @title Token Library

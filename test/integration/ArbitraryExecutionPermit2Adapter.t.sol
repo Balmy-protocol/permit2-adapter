@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.0;
 
-import { IERC4626, IERC20 } from "@openzeppelin/contracts/interfaces/IERC4626.sol";
+import { IERC4626, IERC20 } from "@openzeppelin/contracts-4.8.0/interfaces/IERC4626.sol";
 import { PRBTest } from "@prb/test/PRBTest.sol";
 import { StdCheats } from "forge-std/StdCheats.sol";
 import { IDCAHub } from "./external/IDCAHub.sol";
