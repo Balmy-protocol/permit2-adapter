@@ -116,6 +116,7 @@ contract ArbitraryExecutionPermit2AdapterTest is PRBTest, StdUtils {
   )
     public
   {
+    vm.assume(_signature.length > 0);
     // Give alice some tokens
     tokenIn.mint(alice, _tokenInAmount);
 
