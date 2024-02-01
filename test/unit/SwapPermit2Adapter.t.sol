@@ -184,6 +184,7 @@ contract SwapPermit2AdapterTest is PRBTest, StdUtils {
   )
     public
   {
+    vm.assume(_signature.length > 0);
     tokenIn.mint(alice, _amountIn);
     vm.deal(address(swapper), _amountOut);
 
@@ -238,6 +239,7 @@ contract SwapPermit2AdapterTest is PRBTest, StdUtils {
   )
     public
   {
+    vm.assume(_signature.length > 0);
     _amountOut = bound(_amountOut, 0, type(uint256).max - 1);
 
     tokenIn.mint(alice, _amountIn);
@@ -448,6 +450,7 @@ contract SwapPermit2AdapterTest is PRBTest, StdUtils {
   )
     public
   {
+    vm.assume(_signature.length > 0);
     tokenIn.mint(alice, _amountIn);
     vm.deal(address(swapper), _amountOut);
 
@@ -503,6 +506,7 @@ contract SwapPermit2AdapterTest is PRBTest, StdUtils {
   )
     public
   {
+    vm.assume(_signature.length > 0);
     _amountOut = bound(_amountOut, 0, type(uint256).max - 1);
 
     tokenIn.mint(alice, _amountIn);
@@ -624,6 +628,7 @@ contract SwapPermit2AdapterTest is PRBTest, StdUtils {
   )
     public
   {
+    vm.assume(_signature.length > 0);
     vm.assume(_maxAmountIn > 1);
     _amountUsed = bound(_amountUsed, 1, _maxAmountIn - 1);
 

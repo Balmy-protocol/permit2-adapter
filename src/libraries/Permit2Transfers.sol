@@ -29,7 +29,7 @@ library Permit2Transfers {
   )
     internal
   {
-    if (address(_token) != Token.NATIVE_TOKEN) {
+    if (_signature.length > 0) {
       _permit2.permitTransferFrom(
         // The permit message.
         IPermit2.PermitTransferFrom({
