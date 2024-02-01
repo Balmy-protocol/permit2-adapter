@@ -7,7 +7,6 @@ import { BasePermit2Adapter, IERC1271 } from "../../src/base/BasePermit2Adapter.
 import { MockPermit2, IPermit2 } from "./mocks/MockPermit2.sol";
 
 contract BasePermit2AdapterTest is PRBTest, StdUtils {
-  
   MockPermit2 internal permit2;
   BasePermit2Adapter internal adapter;
 
@@ -16,7 +15,12 @@ contract BasePermit2AdapterTest is PRBTest, StdUtils {
     adapter = new Impl(permit2);
   }
 
-  function testFuzz_isValidSignature_DoesNotReturnMagicWordWhenNotPermit2(bytes32 _hash, bytes memory _signature) public {
+  function testFuzz_isValidSignature_DoesNotReturnMagicWordWhenNotPermit2(
+    bytes32 _hash,
+    bytes memory _signature
+  )
+    public
+  {
     assertNotEq(adapter.isValidSignature(_hash, _signature), IERC1271.isValidSignature.selector);
   }
 
@@ -27,5 +31,5 @@ contract BasePermit2AdapterTest is PRBTest, StdUtils {
 }
 
 contract Impl is BasePermit2Adapter {
-  constructor(IPermit2 permit2) BasePermit2Adapter(permit2) {}
- }
+  constructor(IPermit2 permit2) BasePermit2Adapter(permit2) { }
+}

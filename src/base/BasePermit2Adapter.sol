@@ -30,14 +30,12 @@ abstract contract BasePermit2Adapter is IBasePermit2Adapter, IERC1271 {
   receive() external payable { }
 
   function isValidSignature(bytes32, bytes memory) external view returns (bytes4 magicValue) {
-    // Note: both swap and arbitrary adapters support approving tokens for other addresses, for integrations to work. The 
-    //       thing is that sometimes, these third party contracts use Permit2 instead of using ERC20's transfer from. When 
-    //       that happens, the allowance target will need to be the Permit2 contract, and then Permit2 will call this function 
-    //       to make sure we authorize the  extraction of tokens. Since this contract is not meant to hold any funds outside 
-    //       of the scope of a swap or arbitrary execution, we'll allow it
-    return msg.sender == address(PERMIT2)
-      ? MAGIC_WORD
-      : bytes4(0) ;
+    // Note: both swap and arbitrary adapters support approving tokens for other addresses, for integrations to work. The
+    //       thing is that sometimes, these third party contracts use Permit2 instead of using ERC20's transfer from.
+    //       When that happens, the allowance target will need to be the Permit2 contract, and then Permit2 will call
+    //       this function to make sure we authorize the  extraction of tokens. Since this contract is not meant to hold
+    //       any funds outside of the scope of a swap or arbitrary execution, we'll allow it
+    return msg.sender == address(PERMIT2) ? MAGIC_WORD : bytes4(0);
   }
 
   modifier checkDeadline(uint256 _deadline) {
