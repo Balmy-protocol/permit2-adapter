@@ -598,7 +598,7 @@ contract SwapPermit2AdapterTest is PRBTest, StdUtils {
         _maxAmountIn - _amountUsed,
         address(tokenOut),
         _amountOut
-        ),
+      ),
       tokenOut: address(tokenOut),
       amountOut: _amountOut,
       transferOut: Utils.buildDistribution(alice),
@@ -651,7 +651,7 @@ contract SwapPermit2AdapterTest is PRBTest, StdUtils {
         _maxAmountIn - _amountUsed,
         address(0),
         _amountOut
-        ),
+      ),
       tokenOut: address(0),
       amountOut: _amountOut,
       transferOut: Utils.buildDistribution(alice),

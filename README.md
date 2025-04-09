@@ -7,8 +7,8 @@ To help in those cases, we've built the Universal Permit2 Adapter. It's basicall
 Permit2 capabilities to existing contracts, without having to to re-deploy.
 
 If you'd like to interact with these contracts, we suggest you use our
-[SDK](https://github.com/Mean-Finance/sdk/tree/main/src/services/permit2) that already handles most of the complexities
-around it.
+[SDK](https://github.com/Balmy-protocol/sdk/tree/main/src/services/permit2) that already handles most of the
+complexities around it.
 
 ## Usage
 
