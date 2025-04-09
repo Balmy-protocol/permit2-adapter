@@ -2,13 +2,12 @@
 pragma solidity >=0.8.0;
 
 import { IPermit2 } from "../interfaces/external/IPermit2.sol";
-import { Token } from "./Token.sol";
-
 /**
  * @title Permit2 Transfers Library
  * @author Sam Bugs
  * @notice A small library to call Permit2's transfer from methods
  */
+
 library Permit2Transfers {
   /**
    * @notice Executes a transfer from using Permit2
